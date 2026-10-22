@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IJSSE | International Journal of Scientific & Social Excellence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #991b1b;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.5; }
+        h1, h2, h3, .serif { font-family: 'Merriweather', serif; }
+        .container { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+
+        /* Top Bar */
+        .top-bar { background: #0f172a; color: #cbd5e1; font-size: 12px; padding: 8px 0; border-bottom: 1px solid #1e293b; }
+        .top-bar-inner { display: flex; justify-content: space-between; align-items: center; }
+        .issn-badges span { margin-right: 18px; color: #93c5fd; font-weight: 600; }
+
+        /* Header */
+        header { background: var(--surface); padding: 24px 0; border-bottom: 2px solid var(--primary); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .journal-title h1 { font-size: 24px; color: var(--primary); margin-bottom: 4px; font-weight: 700; }
+        .journal-title p { font-size: 13px; color: var(--text-sub); }
+        .scopus-badge { background: #fef2f2; border: 1px solid #fecaca; color: var(--secondary); font-weight: 700; padding: 8px 16px; border-radius: 6px; font-size: 13px; text-align: center; }
+
+        /* Navigation */
+        nav { background: var(--primary); }
+        .nav-list { display: flex; list-style: none; overflow-x: auto; }
+        .nav-list li a { display: block; color: #ffffff; padding: 14px 18px; text-decoration: none; font-size: 13px; font-weight: 600; white-space: nowrap; transition: background 0.2s; cursor: pointer; }
+        .nav-list li a:hover, .nav-list li.active a { background: #172554; }
+
+        /* Main Layout */
+        .main-layout { display: grid; grid-template-columns: 280px 1fr 280px; gap: 24px; margin: 30px 0; }
+        .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .sidebar-title { font-size: 16px; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 14px; font-weight: 700; }
+        .side-menu { list-style: none; }
+        .side-menu li { margin-bottom: 8px; }
+        .side-menu a { color: var(--text-sub); text-decoration: none; font-size: 13px; display: block; padding: 6px 8px; border-radius: 4px; }
+        .side-menu a:hover { background: #f1f5f9; color: var(--primary); }
+
+        /* Content Area */
+        .content-area { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px; }
+        .article-card { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
+        .article-card:last-child { border-bottom: none; }
+        .article-title { font-size: 17px; color: var(--primary); margin-bottom: 6px; font-weight: 700; text-decoration: none; display: block; }
+        .article-authors { font-size: 13px; color: var(--secondary); font-weight: 600; margin-bottom: 6px; }
+        .article-abstract { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin-bottom: 10px; }
+        .article-meta { display: flex; gap: 16px; font-size: 12px; color: #64748b; }
+        .btn-sm { padding: 4px 10px; background: #e0e7ff; color: var(--primary); border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 12px; }
+
+        /* Form Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-box { background: #fff; width: 500px; max-width: 90%; border-radius: 8px; padding: 24px; }
+        .form-row { margin-bottom: 14px; }
+        .form-row label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .form-row input, .form-row select, .form-row textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; }
+        .btn-submit { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container top-bar-inner">
+            <div class="issn-badges">
+                <span>Print ISSN: 2395-1443</span>
+                <span>Online ISSN: 2395-1451</span>
+                <span>DOI Prefix: 10.47191/ijsse</span>
+            </div>
+            <div>
+                <a href="javascript:void(0)" onclick="openModal('Login / Portal Access')" style="color:#cbd5e1; text-decoration:none; margin-left:14px;">Author Login</a>
+                <a href="javascript:void(0)" onclick="openModal('Editor Dashboard')" style="color:#cbd5e1; text-decoration:none; margin-left:14px;">Editor Login</a>
+                <a href="javascript:void(0)" onclick="openModal('Reviewer Portal')" style="color:#cbd5e1; text-decoration:none; margin-left:14px;">Reviewer Login</a>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container header-content">
+            <div class="journal-title">
+                <h1>International Journal of Scientific & Social Excellence</h1>
+                <p>Peer-Reviewed, Open Access, Scopus Indexed Monthly Multidisciplinary Research Journal</p>
+            </div>
+            <div class="scopus-badge">
+                Indexed in Scopus (Elsevier)<br><small>Impact Factor: 4.82 | UGC CARE Listed</small>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul class="nav-list">
+                <li class="active"><a onclick="showTab('home')">Home</a></li>
+                <li><a onclick="showTab('about')">About Journal</a></li>
+                <li><a onclick="showTab('ethics')">Publication Ethics</a></li>
+                <li><a onclick="showTab('editorial')">Editorial Board</a></li>
+                <li><a onclick="showTab('authors')">For Authors</a></li>
+                <li><a onclick="showTab('reviewers')">For Reviewers</a></li>
+                <li><a onclick="showTab('current')">Current Issue</a></li>
+                <li><a onclick="showTab('archive')">Archives</a></li>
+                <li><a onclick="showTab('call')">Call for Papers</a></li>
+                <li><a onclick="showTab('contact')">Contact Us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-layout">
+        <!-- Left Sidebar -->
+        <aside>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Author Gateway</div>
+                <ul class="side-menu">
+                    <li><a href="javascript:void(0)" onclick="openModal('Submit Manuscript')">📝 Submit Manuscript Online</a></li>
+                    <li><a href="javascript:void(0)" onclick="showTab('authors')">📋 Author Guidelines</a></li>
+                    <li><a href="javascript:void(0)" onclick="showTab('authors')">📄 Download Article Template (.docx)</a></li>
+                    <li><a href="javascript:void(0)" onclick="showTab('authors')">📑 Copyright Form Template (.pdf)</a></li>
+                    <li><a href="javascript:void(0)" onclick="showTab('authors')">💳 Publication Charges (APC)</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal('Check Paper Status')">🔍 Track Manuscript Status</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Indexing & Metrics</div>
+                <div style="font-size:12px; color:var(--text-sub); line-height:1.8;">
+                    ✓ Scopus Elsevier<br>
+                    ✓ CrossRef DOIs<br>
+                    ✓ Google Scholar Metrics<br>
+                    ✓ Directory of Open Access Journals (DOAJ)<br>
+                    ✓ Index Copernicus Value (ICV): 94.6
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Content -->
+        <main class="content-area" id="mainSection">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="font-size:20px; color:var(--primary);">Volume 12, Issue 4 (April 2026) - Current Issue</h2>
+                <span style="font-size:12px; background:#e0f2fe; color:#0369a1; padding:4px 8px; border-radius:4px; font-weight:600;">8 Articles Published</span>
+            </div>
+
+            <!-- Article 1 -->
+            <div class="article-card">
+                <a href="#" class="article-title">Deep Multimodal Transformer Architectures for Autonomous Climate Forecasting in Sub-Saharan Basins</a>
+                <div class="article-authors">Dr. Adebayo Ogunlesi, Dr. Priya Ramanathan, Prof. Ethan Vance</div>
+                <div class="article-abstract">This paper presents a physics-informed deep multimodal neural model integrating satellite hyperspectral telemetry with hydrological runoff indices, demonstrating a 34.2% reduction in precipitation RMSE over conventional ECMWF models.</div>
+                <div class="article-meta">
+                    <span>Pages: 104-118</span>
+                    <span>DOI: 10.47191/ijsse.v12i4.01</span>
+                    <a href="javascript:void(0)" class="btn-sm" onclick="alert('Downloading Full PDF Paper...')">Download PDF</a>
+                </div>
+            </div>
+
+            <!-- Article 2 -->
+            <div class="article-card">
+                <a href="#" class="article-title">Socio-Economic Impacts of Microfinance Blockchain Smart Contracts on Rural Agricultural Cooperatives</a>
+                <div class="article-authors">Prof. Elena Rostova, Kenneth M. O'Connor</div>
+                <div class="article-abstract">Empirical analysis across 14,000 decentralized credit ledger transactions demonstrating significant cost reduction in intermediary banking margins and enhanced default risk transparency among smallholder tea growers.</div>
+                <div class="article-meta">
+                    <span>Pages: 119-134</span>
+                    <span>DOI: 10.47191/ijsse.v12i4.02</span>
+                    <a href="javascript:void(0)" class="btn-sm" onclick="alert('Downloading Full PDF Paper...')">Download PDF</a>
+                </div>
+            </div>
+
+            <!-- Article 3 -->
+            <div class="article-card">
+                <a href="#" class="article-title">Quantum Key Distribution with High-Dimensional Orbital Angular Momentum States Over Atmospheric Channels</a>
+                <div class="article-authors">Dr. Chen Wei, Dr. Rajeshwari Sundaram</div>
+                <div class="article-abstract">Experimental demonstration of decoy-state quantum cryptography achieving a secure key rate of 2.4 Mbps over a 12 km turbulent free-space optical link in daylight conditions.</div>
+                <div class="article-meta">
+                    <span>Pages: 135-149</span>
+                    <span>DOI: 10.47191/ijsse.v12i4.03</span>
+                    <a href="javascript:void(0)" class="btn-sm" onclick="alert('Downloading Full PDF Paper...')">Download PDF</a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Article Spotlights</div>
+                <ul class="side-menu">
+                    <li><a href="#">🔥 <strong>Most Viewed:</strong> AI in Vaccine Synthesis (4,120 views)</a></li>
+                    <li><a href="#">⭐ <strong>Most Cited:</strong> Scalable Edge Federated Learning (84 citations)</a></li>
+                    <li><a href="#">⏳ <strong>In-Press:</strong> Nanomaterial Battery Cathodes (Issue 5 preview)</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Call For Papers</div>
+                <p style="font-size:12px; color:var(--text-sub); margin-bottom:12px;">Manuscripts are invited for upcoming Volume 12, Issue 5. Fast-track peer review within 14 days.</p>
+                <button class="btn-submit" style="width:100%; font-size:13px;" onclick="openModal('Submit Manuscript')">Submit Article Now</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modal Form -->
+    <div id="modalPortal" class="modal">
+        <div class="modal-box">
+            <h3 id="modalTitle" style="color:var(--primary); margin-bottom:16px;">Portal Form</h3>
+            <form onsubmit="handleForm(event)">
+                <div class="form-row">
+                    <label>Corresponding Author / User Name</label>
+                    <input type="text" id="mName" required placeholder="Full Name">
+                </div>
+                <div class="form-row">
+                    <label>Official Email</label>
+                    <input type="email" id="mEmail" required placeholder="user@university.edu">
+                </div>
+                <div class="form-row">
+                    <label>Manuscript Title / Request Detail</label>
+                    <input type="text" id="mTitle" required placeholder="Paper title or registration note">
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                    <button type="button" onclick="closeModal()" style="padding:8px 16px; background:#cbd5e1; border:none; border-radius:6px; cursor:pointer;">Cancel</button>
+                    <button type="submit" class="btn-submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(title) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalPortal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('modalPortal').style.display = 'none'; }
+        function handleForm(e) {
+            e.preventDefault();
+            alert('Your request for [' + document.getElementById('modalTitle').innerText + '] has been submitted successfully to the Editorial Office.');
+            closeModal();
+        }
+        function showTab(tab) {
+            const m = document.getElementById('mainSection');
+            if(tab === 'about') {
+                m.innerHTML = '<h2 style="color:var(--primary); margin-bottom:12px;">About IJSSE</h2><p style="font-size:14px; line-height:1.7; color:var(--text-sub);">The International Journal of Scientific and Social Excellence (IJSSE) is a multidisciplinary, peer-reviewed international forum publishing pioneering scientific research, empirical sociological analyses, and technological advances. Published monthly with Print ISSN 2395-1443 and Online ISSN 2395-1451.</p><br><p style="font-size:14px; color:var(--text-sub);">All accepted manuscripts undergo double-blind peer review supervised by field editors and subject specialists.</p>';
+            } else if(tab === 'ethics') {
+                m.innerHTML = '<h2 style="color:var(--primary); margin-bottom:12px;">Publication Ethics & Malpractice Statement</h2><p style="font-size:14px; line-height:1.7; color:var(--text-sub);">IJSSE strictly follows the Committee on Publication Ethics (COPE) guidelines. Plagiarism in any form, including auto-plagiarism and data fabrication, results in immediate rejection and notification of institutional authorities. All submissions are vetted via CrossCheck/Turnitin.</p>';
+            } else if(tab === 'editorial') {
+                m.innerHTML = '<h2 style="color:var(--primary); margin-bottom:12px;">Editorial Board Committee</h2><p style="font-size:13px; color:var(--text-sub); margin-bottom:16px;"><strong>Editor-in-Chief:</strong> Prof. Dr. Alistair Finch, Cambridge Univ.<br><strong>Associate Editors:</strong> Prof. R. Ramanujam (IIT Madras), Dr. Clara Dubois (Sorbonne), Dr. Kenji Sato (Univ. Tokyo).<br><br>Interested scholars may register as reviewers or editors using the Author/Editor registration portal.</p>';
+            } else if(tab === 'authors') {
+                m.innerHTML = '<h2 style="color:var(--primary); margin-bottom:12px;">Author Guidelines & Submission Checklist</h2><ul style="font-size:14px; line-height:1.8; color:var(--text-sub); padding-left:20px;"><li>Manuscripts must be formatted using the IJSSE standard Microsoft Word template.</li><li>Article Processing Charge (APC): USD 120 / INR 3,500 upon acceptance.</li><li>All references must include active CrossRef DOI links.</li><li>Authors must submit signed copyright warranty forms.</li></ul>';
+            } else {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KodaikanalEats | Fine Dining & Hilltop Restaurant Reservations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #854d0e;
+            --primary-dark: #713f12;
+            --accent: #d97706;
+            --bg: #fefce8;
+            --surface: #ffffff;
+            --text-dark: #451a03;
+            --text-muted: #78350f;
+            --border: #fef08a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fffbeb; color: #451a03; }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header */
+        header { background: #451a03; color: #fef3c7; padding: 18px 0; border-bottom: 3px solid var(--accent); }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 24px; font-weight: 700; color: #fef08a; }
+        .nav-links { display: flex; gap: 20px; list-style: none; }
+        .nav-links a { color: #fde68a; text-decoration: none; font-size: 14px; font-weight: 600; }
+        .btn-reserve { background: var(--accent); color: #fff; padding: 8px 18px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 13px; }
+
+        /* Hero */
+        .hero { background: linear-gradient(rgba(69,26,3,0.8), rgba(69,26,3,0.8)), #713f12; color: #fff; padding: 60px 0; text-align: center; }
+        .hero h1 { font-size: 40px; margin-bottom: 12px; }
+        .hero p { font-size: 16px; color: #fef08a; max-width: 600px; margin: 0 auto 24px; }
+
+        /* Filter Controls */
+        .search-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: -30px auto 40px; max-width: 1000px; box-shadow: 0 10px 25px rgba(69,26,3,0.1); display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 14px; align-items: center; }
+        .search-bar input, .search-bar select { padding: 10px 14px; border: 1px solid #fed7aa; border-radius: 8px; font-size: 14px; width: 100%; }
+
+        /* Restaurant Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 50px; }
+        .rest-card { background: var(--surface); border: 1px solid #fde68a; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .rest-img { height: 160px; background: #b45309; display: flex; align-items: center; justify-content: center; font-size: 48px; color: #fff; }
+        .rest-body { padding: 20px; }
+        .rest-title { font-size: 19px; font-weight: 700; margin-bottom: 4px; color: #713f12; }
+        .rest-meta { font-size: 13px; color: #92400e; margin-bottom: 12px; }
+        .rest-desc { font-size: 13px; color: #57534e; line-height: 1.5; margin-bottom: 16px; }
+        
+        /* Suite & Room Boys Table */
+        .admin-section { background: var(--surface); border: 1px solid #fde68a; border-radius: 14px; padding: 28px; margin-bottom: 50px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #fef3c7; font-size: 13px; }
+        th { background: #fef3c7; color: #78350f; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="brand">Kodaikanal<span>Eats</span></div>
+            <ul class="nav-links">
+                <li><a href="#restaurants">Restaurants</a></li>
+                <li><a href="#suites">Suites & Stays</a></li>
+                <li><a href="#staff">Attendants & Room Boys</a></li>
+                <li><a href="#offers">Special Offers</a></li>
+            </ul>
+            <a href="javascript:void(0)" class="btn-reserve" onclick="bookTable('The Royal Mist')">Book Table Now</a>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container">
+            <h1>Scenic Dining & Hilltop Culinary Reservations</h1>
+            <p>Experience artisanal eucalyptus wood-fired dining, organic valley views, and cozy candlelit fireplace tables in Kodaikanal.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Search bar -->
+        <div class="search-bar">
+            <input type="text" placeholder="Search by restaurant name, valley location, or specialty dish...">
+            <select>
+                <option>All Cuisines</option>
+                <option>Traditional Chettinad</option>
+                <option>Continental & Woodfired</option>
+                <option>Tibetan Momos & Thukpa</option>
+            </select>
+            <select>
+                <option>Any Location</option>
+                <option>Coaker's Walk Ridge</option>
+                <option>Pillar Rocks Vista</option>
+                <option>Lake Road Waterfront</option>
+            </select>
+            <button class="btn-reserve" style="border:none; cursor:pointer; padding:12px 24px;" onclick="alert('Filtering available tables across Kodaikanal!')">Filter</button>
+        </div>
+
+        <!-- Restaurants -->
+        <div class="grid" id="restaurants">
+            <div class="rest-card">
+                <div class="rest-img" style="background:linear-gradient(135deg, #78350f, #b45309);">🍲</div>
+                <div class="rest-body">
+                    <div class="rest-title">The Royal Mist Panorama</div>
+                    <div class="rest-meta">⭐ 4.9 (420 reviews) • Upper Lake Road</div>
+                    <div class="rest-desc">Fine dining terrace overlooking the misty pine valleys. Specialties include slow-roasted mutton biryani and hot plum cake.</div>
+                    <button class="btn-reserve" style="width:100%; border:none; cursor:pointer;" onclick="bookTable('The Royal Mist Panorama')">Reserve Table</button>
+                </div>
+            </div>
+            <div class="rest-card">
+                <div class="rest-img" style="background:linear-gradient(135deg, #b45309, #d97706);">🍕</div>
+                <div class="rest-body">
+                    <div class="rest-title">Pine Wood Fire Bistro</div>
+                    <div class="rest-meta">⭐ 4.8 (380 reviews) • Near Bryant Park</div>
+                    <div class="rest-desc">Authentic sourdough pizzas baked in firewood clay ovens, paired with artisanal hot chocolate and organic farm salads.</div>
+                    <button class="btn-reserve" style="width:100%; border:none; cursor:pointer;" onclick="bookTable('Pine Wood Fire Bistro')">Reserve Table</button>
+                </div>
+            </div>
+            <div class="rest-card">
+                <div class="rest-img" style="background:linear-gradient(135deg, #92400e, #78350f);">☕</div>
+                <div class="rest-body">
+                    <div class="rest-title">Cloud 9 Tibetan Kitchen</div>
+                    <div class="rest-meta">⭐ 4.7 (290 reviews) • PT Road Bazaar</div>
+                    <div class="rest-desc">Steaming herbal thukpa, hand-folded steamed dumplings, and authentic butter tea for cold hill-station evenings.</div>
+                    <button class="btn-reserve" style="width:100%; border:none; cursor:pointer;" onclick="bookTable('Cloud 9 Tibetan Kitchen')">Reserve Table</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integrated Resort Suites & Seasonal Tariff -->
+        <div class="admin-section" id="suites">
+            <h3 style="font-size:22px; margin-bottom:6px;">Resort Suite Accommodation & Seasonal Pricing Matrix</h3>
+            <p style="font-size:13px; color:#78350f; margin-bottom:14px;">Integrated stay and dining packages for tourists with peak season / off-season dynamic rates.</p>
+            <table>
+                <thead>
+                    <tr><th>Room / Suite Type</th><th>Capacity</th><th>Off-Season Rate</th><th>Peak Season Rate</th><th>Availability Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Pine Forest Single Room</td><td>1 Adult</td><td>₹2,200 / night</td><td>₹3,500 / night</td><td><span style="color:green;font-weight:600;">8 Rooms Free</span></td></tr>
+                    <tr><td>Valley View Double Deluxe</td><td>2 Adults, 1 Child</td><td>₹4,500 / night</td><td>₹6,800 / night</td><td><span style="color:green;font-weight:600;">5 Rooms Free</span></td></tr>
+                    <tr><td>Presidential Fireplace Suite</td><td>4 Adults</td><td>₹8,900 / night</td><td>₹13,500 / night</td><td><span style="color:orange;font-weight:600;">2 Suites Free</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Room Boy & Attendant Duty Registry -->
+        <div class="admin-section" id="staff">
+            <h3 style="font-size:22px; margin-bottom:6px;">Attendant & Room Boy Roster Maintenance</h3>
+            <p style="font-size:13px; color:#78350f; margin-bottom:14px;">Real-time service allocation for room service and restaurant table assistance.</p>
+            <table>
+                <thead>
+                    <tr><th>Staff ID</th><th>Attendant Name</th><th>Assigned Wing / Floors</th><th>Shift</th><th>Current Duty Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>RB-201</td><td>Mani Karthik</td><td>Pine Wing (Rooms 101-115)</td><td>Morning (06:00 - 14:00)</td><td><span style="color:green;">On Duty (Free)</span></td></tr>
+                    <tr><td>RB-202</td><td>Selvan Raj</td><td>Valley Suites (Rooms 201-210)</td><td>Morning (06:00 - 14:00)</td><td><span style="color:blue;">Serving Suite 204</span></td></tr>
+                    <tr><td>RB-203</td><td>Prakash M.</td><td>Terrace Restaurant & Lawn</td><td>Evening (14:00 - 22:00)</td><td><span style="color:green;">On Duty (Free)</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function bookTable(name) {
+            const guests = prompt('Enter number of guests for reservation at ' + name + ':', '2');
+            if(guests) {
+                alert('Table Reserved! Booking confirmed for ' + guests + ' guests at ' + name + '. An SMS confirmation with GPS coordinates has been sent.');
+            }
+        }
+    </script>
+</body>
+</html>

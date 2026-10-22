@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtistryHub | Emily Harris Official Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0f14;
+            --surface: #161922;
+            --surface2: #1e2330;
+            --primary: #d4af37;
+            --primary-glow: rgba(212, 175, 55, 0.25);
+            --accent: #e76f51;
+            --text: #f0f2f8;
+            --text-dim: #9aa1b5;
+            --border: #2a3142;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        
+        /* Navbar */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 32px; border-bottom: 1px solid var(--border); background: rgba(13,15,20,0.85); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 24px; list-style: none; }
+        .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); }
+        .btn-gold { background: linear-gradient(135deg, #d4af37, #b89324); color: #0d0f14; font-weight: 700; padding: 10px 22px; border-radius: 30px; text-decoration: none; border: none; cursor: pointer; transition: transform 0.2s; }
+        .btn-gold:hover { transform: translateY(-2px); }
+
+        /* Hero */
+        .hero { padding: 80px 0 60px; text-align: center; background: radial-gradient(circle at 50% 20%, rgba(212,175,55,0.12) 0%, transparent 60%); }
+        .hero h1 { font-size: 54px; margin-bottom: 16px; letter-spacing: -0.5px; }
+        .hero p { font-size: 18px; color: var(--text-dim); max-width: 650px; margin: 0 auto 30px; }
+        .hero-badge { display: inline-block; padding: 6px 16px; background: rgba(212,175,55,0.15); border: 1px solid var(--primary); color: var(--primary); border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
+
+        /* Grid sections */
+        .section-title { font-size: 32px; margin-bottom: 12px; }
+        .section-sub { color: var(--text-dim); margin-bottom: 36px; font-size: 15px; }
+        
+        .artwork-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 60px; }
+        .art-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform 0.3s; }
+        .art-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .art-img { height: 200px; background-size: cover; background-position: center; display: flex; align-items: flex-end; padding: 16px; position: relative; }
+        .art-tag { background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); color: var(--primary); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px; }
+        .art-info { padding: 18px; }
+        .art-info h3 { font-size: 18px; margin-bottom: 6px; }
+        .art-info p { font-size: 13px; color: var(--text-dim); margin-bottom: 12px; }
+        .art-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--primary); font-weight: 600; }
+
+        /* Player & Media */
+        .media-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 60px; }
+        .player-track { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--surface2); border-radius: 10px; margin-bottom: 12px; }
+        .play-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; font-weight: bold; }
+        
+        /* Bibliography table */
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { color: var(--primary); font-weight: 600; }
+
+        /* Newsletter & Footer */
+        .newsletter { background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(231,111,81,0.1)); border: 1px solid var(--primary); border-radius: 16px; padding: 40px; text-align: center; margin-bottom: 60px; }
+        .newsletter input { padding: 12px 18px; border-radius: 30px; border: 1px solid var(--border); background: var(--surface); color: #fff; width: 320px; max-width: 80%; margin-right: 12px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">ARTISTRY<span>HUB</span></div>
+        <ul class="nav-links">
+            <li><a href="#about" class="active">Biography</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#audio">Soundscapes</a></li>
+            <li><a href="#bibliography">Publications</a></li>
+            <li><a href="#exhibitions">Exhibitions</a></li>
+        </ul>
+        <button class="btn-gold" onclick="subscribeAlert()">Stay Inspired</button>
+    </nav>
+
+    <div class="hero">
+        <div class="container">
+            <span class="hero-badge">Curated Fine Art & Contemporary Literature</span>
+            <h1>Emily Harris</h1>
+            <p>Master visual artist, composer, and essayist exploring modern realism, ethereal impressionism, and human resonance across physical & digital canvases.</p>
+            <div style="display:flex; justify-content:center; gap:16px;">
+                <a href="#gallery" class="btn-gold">Explore Collection</a>
+                <button class="btn-gold" style="background:var(--surface); color:#fff; border:1px solid var(--border);" onclick="openBio()">Read Monograph</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Gallery -->
+        <section id="gallery" style="padding: 40px 0;">
+            <h2 class="section-title">Selected Visual Artworks</h2>
+            <p class="section-sub">High-definition oil paintings, bronze textures, and atmospheric fine art prints.</p>
+            <div class="artwork-grid">
+                <div class="art-card">
+                    <div class="art-img" style="background-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent), radial-gradient(circle, #5e3a8c, #1f1430);">
+                        <span class="art-tag">Oil on Canvas</span>
+                    </div>
+                    <div class="art-info">
+                        <h3>Solitude of the Horizon</h3>
+                        <p>A meditative portrayal of morning mist over the North Atlantic cliffs.</p>
+                        <div class="art-meta"><span>Year: 2024</span><span>Exhibited: London Tate</span></div>
+                    </div>
+                </div>
+                <div class="art-card">
+                    <div class="art-img" style="background-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent), radial-gradient(circle, #e76f51, #3c150c);">
+                        <span class="art-tag">Mixed Media</span>
+                    </div>
+                    <div class="art-info">
+                        <h3>Crimson Cadence No. 4</h3>
+                        <p>Textured acrylic, gold leaf, and sand pigment reflecting metropolitan pulse.</p>
+                        <div class="art-meta"><span>Year: 2025</span><span>Private Collection</span></div>
+                    </div>
+                </div>
+                <div class="art-card">
+                    <div class="art-img" style="background-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent), radial-gradient(circle, #2a9d8f, #0d3832);">
+                        <span class="art-tag">Sculpture / Bronze</span>
+                    </div>
+                    <div class="art-info">
+                        <h3>Echoes of Verdigris</h3>
+                        <p>Cold-cast verdigris bronze capturing aerodynamic bird silhouettes.</p>
+                        <div class="art-meta"><span>Year: 2026</span><span>Venice Biennale</span></div>
+                    </div>
+                </div>
+                <div class="art-card">
+                    <div class="art-img" style="background-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent), radial-gradient(circle, #d4af37, #453606);">
+                        <span class="art-tag">Digital Canvas</span>
+                    </div>
+                    <div class="art-info">
+                        <h3>Aura in Flux</h3>
+                        <p>Generative vector composition minted with museum-grade physical canvas print.</p>
+                        <div class="art-meta"><span>Year: 2026</span><span>Basel Showcase</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audio & Excerpts -->
+        <section id="audio" class="media-box">
+            <h2 class="section-title">Music Composition & Spoken Poetry</h2>
+            <p class="section-sub">Acoustic piano soundscapes composed to accompany gallery installations.</p>
+            <div class="player-track">
+                <div>
+                    <strong>Nocturne in B Minor - Op. 14 "Dusk Reflection"</strong>
+                    <div style="font-size:12px; color:var(--text-dim);">Solo Grand Piano & Cello Ensemble | Duration: 4:18</div>
+                </div>
+                <button class="play-btn" onclick="togglePlay(this)">▶</button>
+            </div>
+            <div class="player-track">
+                <div>
+                    <strong>Chambers of Rain - Ambient Suite</strong>
+                    <div style="font-size:12px; color:var(--text-dim);">Prepared Piano with Hydrophone Hydro-Atmospherics | Duration: 6:02</div>
+                </div>
+                <button class="play-btn" onclick="togglePlay(this)">▶</button>
+            </div>
+        </section>
+
+        <!-- Bibliography -->
+        <section id="bibliography" class="media-box">
+            <h2 class="section-title">Comprehensive Bibliography & Catalog</h2>
+            <p class="section-sub">Published monographs, poetry volumes, and critical treatises.</p>
+            <table>
+                <thead>
+                    <tr><th>Title</th><th>Category</th><th>Publisher / Imprint</th><th>Year</th><th>ISBN / Catalog</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>The Architecture of Shadows</td><td>Art Monograph</td><td>Meridian Fine Arts Press</td><td>2023</td><td>ISBN 978-1-4920-8114-2</td></tr>
+                    <tr><td>Chromatic Whispers: Poems & Sktech</td><td>Literary Anthology</td><td>Veritas Publishing House</td><td>2024</td><td>ISBN 978-0-13-468599-1</td></tr>
+                    <tr><td>Modern Realism in the Post-Digital Era</td><td>Critical Treatise</td><td>Oxford Academy Arts Review</td><td>2025</td><td>ISBN 978-3-16-148410-0</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Newsletter -->
+        <div class="newsletter">
+            <h2 style="font-size:28px; margin-bottom:8px;">Subscribe to Collector's Journal</h2>
+            <p style="color:var(--text-dim); margin-bottom:20px;">Receive exclusive previews of upcoming exhibitions, private auction catalogues, and artist essays.</p>
+            <input type="email" id="emailSub" placeholder="Enter your email address...">
+            <button class="btn-gold" onclick="submitEmail()">Subscribe</button>
+        </div>
+    </div>
+
+    <script>
+        function togglePlay(btn) {
+            btn.innerText = btn.innerText === '▶' ? '⏸' : '▶';
+        }
+        function submitEmail() {
+            const val = document.getElementById('emailSub').value;
+            if(!val || !val.includes('@')) { alert('Please enter a valid email address.'); return; }
+            alert('Thank you! You are now subscribed to Emily Harris Collector Journal.');
+            document.getElementById('emailSub').value = '';
+        }
+        function openBio() {
+            alert('Emily Harris (b. 1988) is an internationally celebrated multimedia artist whose work is housed in prestigious galleries across London, Paris, and Tokyo.');
+        }
+        function subscribeAlert() {
+            document.getElementById('emailSub').focus();
+        }
+    </script>
+</body>
+</html>
