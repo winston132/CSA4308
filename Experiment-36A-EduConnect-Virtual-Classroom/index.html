@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduConnect | Interactive Virtual Classroom & LMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4338ca;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-card: #334155;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-light); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        header { background: #0b1120; padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 22px; font-weight: 800; color: #a5b4fc; }
+
+        .dashboard { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin: 30px 0; }
+        
+        /* Video / Virtual Classroom Area */
+        .video-box { background: #000; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); position: relative; height: 380px; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; background-size: cover; background-position: center; }
+        .video-overlay-top { display: flex; justify-content: space-between; align-items: center; }
+        .live-tag { background: #ef4444; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; }
+        .video-center { text-align: center; }
+        .video-controls { display: flex; justify-content: center; gap: 16px; background: rgba(15,23,42,0.8); backdrop-filter: blur(8px); padding: 10px 20px; border-radius: 30px; width: fit-content; margin: 0 auto; }
+        .control-btn { background: #334155; border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .control-btn.end { background: #ef4444; }
+
+        /* Tabs & Side Content */
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .card h3 { font-size: 17px; margin-bottom: 14px; color: #c7d2fe; }
+
+        .chat-stream { height: 260px; overflow-y: auto; background: #0b1120; border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 13px; }
+        .chat-msg { margin-bottom: 8px; }
+        .chat-msg strong { color: #818cf8; }
+        .chat-input-row { display: flex; gap: 8px; }
+        .chat-input { flex-grow: 1; padding: 8px 12px; background: #0b1120; border: 1px solid var(--border); border-radius: 6px; color: #fff; font-size: 13px; }
+
+        .materials-list { list-style: none; font-size: 13px; }
+        .materials-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .btn-download { color: #a5b4fc; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="brand">EDUCONNECT <span>VIRTUAL CLASSROOM</span></div>
+            <div style="font-size:13px; color:var(--text-muted);">Course: CS402 - Distributed Cloud Architectures</div>
+        </div>
+    </header>
+
+    <div class="container dashboard">
+        <!-- Live Lecture Feed -->
+        <div>
+            <div class="video-box" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), radial-gradient(circle, #312e81, #0f172a);">
+                <div class="video-overlay-top">
+                    <span class="live-tag">● LIVE SESSION</span>
+                    <span style="font-size:12px; background:rgba(0,0,0,0.6); padding:4px 8px; border-radius:4px;">👥 48 Students Attending</span>
+                </div>
+                <div class="video-center">
+                    <h2 style="font-size:24px; font-weight:700;">Lecture 14: Consensus Protocols (Raft & Paxos)</h2>
+                    <p style="color:#94a3b8; font-size:14px; margin-top:6px;">Instructor: Dr. Maya Angelou, Dept. of Computer Science</p>
+                </div>
+                <div class="video-controls">
+                    <button class="control-btn" title="Mic" onclick="alert('Mic toggled')">🎤</button>
+                    <button class="control-btn" title="Camera" onclick="alert('Camera toggled')">📷</button>
+                    <button class="control-btn" title="Screen Share" onclick="alert('Screen sharing active')">🖥️</button>
+                    <button class="control-btn end" title="Leave" onclick="alert('Leaving classroom')">📞</button>
+                </div>
+            </div>
+
+            <!-- Material & Submission Tab -->
+            <div class="card" style="margin-top:20px;">
+                <h3>Lecture Notes, Code Labs & Whiteboard Artifacts</h3>
+                <ul class="materials-list">
+                    <li>
+                        <span>📄 Slide Deck: Leader Election & Log Replication.pdf</span>
+                        <a href="javascript:void(0)" class="btn-download" onclick="alert('Downloading PDF Slide Deck...')">Download (4.2 MB)</a>
+                    </li>
+                    <li>
+                        <span>💻 Python Lab 04: Simulating Network Partitions in Raft.zip</span>
+                        <a href="javascript:void(0)" class="btn-download" onclick="alert('Downloading Lab Archive...')">Download (890 KB)</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Interactive Discussion Q&A -->
+        <div>
+            <div class="card">
+                <h3>Class Discussion & Live Q&A</h3>
+                <div class="chat-stream" id="chatStream">
+                    <div class="chat-msg"><strong>Rohan:</strong> Does Raft guarantee linearizability during split-brain?</div>
+                    <div class="chat-msg"><strong>Dr. Maya:</strong> Yes, because the minority partition cannot form a quorum to commit logs.</div>
+                    <div class="chat-msg"><strong>Priya:</strong> Can we use Etcd for this week's assignment?</div>
+                </div>
+                <form onsubmit="sendChat(event)" class="chat-input-row">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Type question for instructor...">
+                    <button type="submit" style="background:var(--primary); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;">Send</button>
+                </form>
+            </div>
+
+            <!-- Assignment Submission -->
+            <div class="card" style="margin-top:20px;">
+                <h3>Submit Assignment 04</h3>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Due: Tomorrow, 11:59 PM. Max Score: 100 pts.</p>
+                <input type="file" style="font-size:12px; margin-bottom:12px; display:block;">
+                <button onclick="alert('Assignment submitted successfully! Automatic plagiarism check queued.')" style="width:100%; background:#10b981; color:#fff; border:none; padding:10px; border-radius:6px; font-weight:700; cursor:pointer;">Upload Solution</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendChat(e) {
+            e.preventDefault();
+            const inp = document.getElementById('chatInput');
+            if(!inp.value.trim()) return;
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg';
+            msg.innerHTML = '<strong>You:</strong> ' + inp.value;
+            document.getElementById('chatStream').appendChild(msg);
+            inp.value = '';
+            document.getElementById('chatStream').scrollTop = document.getElementById('chatStream').scrollHeight;
+        }
+    </script>
+</body>
+</html>

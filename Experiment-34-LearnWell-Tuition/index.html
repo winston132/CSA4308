@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnWell Tuition Centre | Premier Academic Coaching & Admissions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #06b6d4;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-dark); line-height: 1.5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        header { background: #0f172a; color: #fff; padding: 18px 0; border-bottom: 3px solid var(--primary); }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 22px; font-weight: 800; color: #818cf8; }
+        .brand span { color: #fff; }
+        .nav-links { display: flex; gap: 20px; list-style: none; }
+        .nav-links a { color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .btn-cta { background: var(--primary); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; }
+
+        /* Announcement Noticeboard */
+        .notice-banner { background: #e0e7ff; color: var(--primary-dark); padding: 12px 20px; border-radius: 8px; margin: 24px auto 0; max-width: 1160px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; }
+
+        .hero { padding: 40px 0 20px; text-align: center; }
+        .hero h1 { font-size: 36px; margin-bottom: 10px; color: #0f172a; }
+        .hero p { color: var(--text-muted); font-size: 16px; max-width: 600px; margin: 0 auto 24px; }
+
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04); }
+        .card h3 { font-size: 18px; margin-bottom: 12px; color: var(--primary-dark); }
+        
+        .faculty-avatar { width: 60px; height: 60px; border-radius: 50%; background: #e0e7ff; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; margin-bottom: 12px; }
+
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+        th { background: #f1f5f9; color: #334155; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="brand">LEARNWELL <span>TUITION</span></div>
+            <ul class="nav-links">
+                <li><a href="#batches">Course Batches</a></li>
+                <li><a href="#faculty">Faculty</a></li>
+                <li><a href="#enroll">Enrollment</a></li>
+                <li><a href="#announcements">Announcements</a></li>
+            </ul>
+            <a href="#enroll" class="btn-cta">Student Admission</a>
+        </div>
+    </header>
+
+    <div class="notice-banner">
+        <span>📢 <strong>Urgent Notice:</strong> CBSE Class 10 & 12 Crash Revision Batches commence from Monday. Limited seats remaining!</span>
+        <button onclick="alert('Notice: Admissions close this Saturday at 06:00 PM.')" style="border:none; background:var(--primary); color:#fff; padding:4px 10px; border-radius:4px; font-size:12px; cursor:pointer;">Details</button>
+    </div>
+
+    <div class="hero">
+        <div class="container">
+            <h1>Excellence in School & Competitive Board Academics</h1>
+            <p>Comprehensive subject coaching for Classes 8 to 12 (CBSE, ICSE & State Board) with weekly diagnostic test series and personalized doubt sessions.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Batches & Fees -->
+        <div class="card" id="batches" style="margin-bottom:30px;">
+            <h3>Active Coaching Batches & Timings (Academic Year 2026)</h3>
+            <table>
+                <thead>
+                    <tr><th>Batch Code</th><th>Class / Stream</th><th>Subjects Covered</th><th>Schedule / Timing</th><th>Monthly Fee</th><th>Seat Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>B-10A</td><td>Class 10 CBSE</td><td>Mathematics & Science Integrated</td><td>Mon, Wed, Fri | 05:00 - 07:00 PM</td><td>₹2,800</td><td><span style="color:green;font-weight:600;">Open (4 Seats)</span></td></tr>
+                    <tr><td>B-12M</td><td>Class 12 CBSE (Maths)</td><td>Calculus, Vectors, Probability</td><td>Tue, Thu, Sat | 06:00 - 08:00 PM</td><td>₹3,500</td><td><span style="color:green;font-weight:600;">Open (2 Seats)</span></td></tr>
+                    <tr><td>B-12P</td><td>Class 12 Physics & Chem</td><td>Advanced Electrodynamics & Organic</td><td>Daily Batches | 07:00 - 09:00 AM</td><td>₹4,200</td><td><span style="color:orange;font-weight:600;">Waitlist</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid-3">
+            <!-- Faculty Details -->
+            <div class="card" id="faculty">
+                <h3>Our Senior Faculty</h3>
+                <div style="display:flex; gap:16px; align-items:center; margin-bottom:16px;">
+                    <div class="faculty-avatar">RK</div>
+                    <div>
+                        <strong>Prof. Rajesh Kumar</strong>
+                        <div style="font-size:12px; color:var(--text-muted);">M.Sc. Mathematics, B.Ed (18 Yrs Exp)</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:16px; align-items:center;">
+                    <div class="faculty-avatar" style="background:#ccfbf1; color:#0d9488;">SV</div>
+                    <div>
+                        <strong>Dr. Shobha Venkat</strong>
+                        <div style="font-size:12px; color:var(--text-muted);">Ph.D. Physics (Ex-Kendriya Vidyalaya HOD)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enrollment Form -->
+            <div class="card" id="enroll" style="grid-column: span 2;">
+                <h3>Student Online Enrollment Form</h3>
+                <form onsubmit="handleEnroll(event)">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <input type="text" class="form-control" id="sName" required placeholder="Student Full Name">
+                        <input type="tel" class="form-control" id="sPhone" required placeholder="Parent Contact Number">
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <select class="form-control" id="sClass">
+                            <option>Class 10 CBSE</option>
+                            <option>Class 12 Science (PCM)</option>
+                            <option>Class 12 Commerce</option>
+                        </select>
+                        <select class="form-control" id="sBatch">
+                            <option>Morning Regular Batch</option>
+                            <option>Evening Foundation Batch</option>
+                            <option>Weekend Intensive Batch</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-cta" style="width:100%; padding:12px; cursor:pointer;">Submit Admission Application</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleEnroll(e) {
+            e.preventDefault();
+            const name = document.getElementById('sName').value;
+            alert('Congratulations ' + name + '! Your enrollment inquiry has been submitted. Academic counselor will call within 2 hours for diagnostic slot booking.');
+        }
+    </script>
+</body>
+</html>

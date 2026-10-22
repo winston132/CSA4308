@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyProfessionalShowcase | Senior Systems Architect Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #10b981;
+            --bg: #0b0f19;
+            --surface: #111827;
+            --surface2: #1f2937;
+            --text-light: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #374151;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-light); }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; border-bottom: 1px solid var(--border); }
+        .logo { font-size: 20px; font-weight: 800; color: #60a5fa; font-family: 'JetBrains Mono', monospace; }
+        .nav-links { display: flex; gap: 24px; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; }
+        .nav-links a:hover { color: #fff; }
+
+        .hero { padding: 70px 0 40px; text-align: center; }
+        .badge { display: inline-block; padding: 6px 14px; background: rgba(37,99,235,0.15); border: 1px solid var(--primary); color: #60a5fa; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+        .hero h1 { font-size: 48px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.5px; }
+        .hero p { font-size: 18px; color: var(--text-muted); max-width: 680px; margin: 0 auto 30px; }
+
+        /* Skills Pill Grid */
+        .skills-wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 800px; margin: 0 auto 50px; }
+        .skill-pill { background: var(--surface2); border: 1px solid var(--border); padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #e5e7eb; }
+
+        /* Projects */
+        .section-title { font-size: 28px; margin-bottom: 24px; text-align: center; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 60px; }
+        .project-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; transition: transform 0.2s; }
+        .project-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+        .project-card h3 { font-size: 18px; margin-bottom: 8px; color: #93c5fd; }
+        .project-card p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+        .tech-tags { display: flex; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+        /* Contact Box */
+        .contact-box { background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(16,185,129,0.1)); border: 1px solid var(--border); border-radius: 16px; padding: 40px; max-width: 700px; margin: 0 auto 60px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="logo">&lt;Architect.Showcase /&gt;</div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#projects">Case Studies</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#contact">Schedule Consultation</a></li>
+            </ul>
+        </nav>
+
+        <div class="hero">
+            <span class="badge">Distributed Cloud & AI Systems Engineer</span>
+            <h1>Vikramaditya Sengupta</h1>
+            <p>12+ years architecting high-throughput distributed microservices, low-latency streaming infrastructure, and resilient Kubernetes platforms for Fortune 500 enterprises.</p>
+            <div class="skills-wrap">
+                <span class="skill-pill">Distributed Consensus</span>
+                <span class="skill-pill">Go / Rust Systems</span>
+                <span class="skill-pill">Apache Kafka / Flink</span>
+                <span class="skill-pill">Kubernetes Multi-Cluster</span>
+                <span class="skill-pill">Terraform & GitOps</span>
+                <span class="skill-pill">PostgreSQL Sharding</span>
+            </div>
+        </div>
+
+        <h2 class="section-title" id="projects">Featured Engineering Case Studies</h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                <h3>Global Payments Settlement Mesh</h3>
+                <p>Engineered an event-driven ledger processing 180,000 TPS with zero data loss under simulated multi-region cloud outages.</p>
+                <div class="tech-tags">Go • gRPC • Kafka • CockroachDB</div>
+            </div>
+            <div class="project-card">
+                <h3>Self-Healing Kubernetes Multi-Cluster</h3>
+                <p>Designed an automated GitOps operator managing 4,500 worker nodes across AWS, GCP, and bare metal on-prem data centers.</p>
+                <div class="tech-tags">Kubernetes • Rust • ArgoCD • Prometheus</div>
+            </div>
+            <div class="project-card">
+                <h3>Real-Time Fraud Telemetry Pipeline</h3>
+                <p>Constructed a sub-5ms real-time inference streaming engine blocking financial fraud across 14 million daily card transactions.</p>
+                <div class="tech-tags">Apache Flink • Redis Cluster • Python PyTorch</div>
+            </div>
+        </div>
+
+        <div class="contact-box" id="contact">
+            <h2 style="font-size:24px; margin-bottom:8px;">Schedule an Architecture Review</h2>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Available for advisory consulting, system design audits, and keynote technical talks.</p>
+            <button onclick="alert('Meeting scheduler opened: Select available 30-min architecture consultation slot on Google Calendar.')" style="background:var(--primary); color:#fff; border:none; padding:12px 28px; border-radius:30px; font-weight:700; cursor:pointer; font-size:14px;">Book 30-Min Discovery Call</button>
+        </div>
+    </div>
+</body>
+</html>

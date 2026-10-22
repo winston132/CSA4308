@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourmet Haven | Contemporary Fine Dining & Gastronomy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c5a880;
+            --primary-dark: #a38258;
+            --bg: #0c0a09;
+            --surface: #1c1917;
+            --text-light: #f5f5f4;
+            --text-muted: #a8a29e;
+            --border: #292524;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-light); }
+        h1, h2, h3, .serif { font-family: 'Cormorant Garamond', serif; }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+        header { padding: 24px 0; border-bottom: 1px solid var(--border); }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 26px; font-weight: 700; color: var(--primary); letter-spacing: 2px; }
+        .nav-links { display: flex; gap: 24px; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+        .nav-links a:hover { color: var(--primary); }
+        .btn-gold { background: var(--primary); color: #000; border: none; padding: 10px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; cursor: pointer; letter-spacing: 1px; }
+
+        .hero { padding: 80px 0 50px; text-align: center; background: radial-gradient(circle at 50% 30%, rgba(197,168,128,0.1) 0%, transparent 70%); }
+        .hero h1 { font-size: 54px; font-weight: 500; margin-bottom: 16px; letter-spacing: 1px; }
+        .hero p { font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto 30px; font-style: italic; }
+
+        /* Tasting Menu Section */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin: 40px 0 60px; }
+        .menu-category h2 { font-size: 30px; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 24px; }
+        .menu-item { margin-bottom: 24px; }
+        .menu-item-header { display: flex; justify-content: space-between; font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .menu-item-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+        /* Reservation Modal */
+        .reserve-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px; max-width: 600px; margin: 0 auto 60px; text-align: center; }
+        .form-control { width: 100%; padding: 10px 14px; background: #0c0a09; border: 1px solid var(--border); border-radius: 6px; color: #fff; margin-bottom: 14px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="logo">GOURMET <span>HAVEN</span></div>
+            <ul class="nav-links">
+                <li><a href="#menu">Tasting Menu</a></li>
+                <li><a href="#wine">Cellar Reserve</a></li>
+                <li><a href="#private">Private Dining</a></li>
+            </ul>
+            <button class="btn-gold" onclick="document.getElementById('rName').focus()">Reserve a Table</button>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container">
+            <h1 class="serif">The Art of Seasonal Gastronomy</h1>
+            <p class="serif">An immersive multi-course symphony curated by Executive Chef Laurent Mercier, harmonizing botanical aromas and French culinary heritage.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="menu-grid" id="menu">
+            <div class="menu-category">
+                <h2>Appetizers & Starters</h2>
+                <div class="menu-item">
+                    <div class="menu-item-header">
+                        <span>Hokkaido Scallop Carpaccio</span>
+                        <span style="color:var(--primary);">₹1,850</span>
+                    </div>
+                    <div class="menu-item-desc">Finger lime, compressed cucumber emulsion, and oscietra caviar pearls.</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-item-header">
+                        <span>Perigord Black Truffle Velouté</span>
+                        <span style="color:var(--primary);">₹1,450</span>
+                    </div>
+                    <div class="menu-item-desc">Artisanal brioche croutons, aged parmesan foam, and roasted hazelnut oil.</div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h2>Principal Entrées</h2>
+                <div class="menu-item">
+                    <div class="menu-item-header">
+                        <span>Dry-Aged Wagyu Striploin A5</span>
+                        <span style="color:var(--primary);">₹4,200</span>
+                    </div>
+                    <div class="menu-item-desc">Parsnip mousseline, caramelized shallot jus, and wild morel mushrooms.</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-item-header">
+                        <span>Wild Brittany Turbot</span>
+                        <span style="color:var(--primary);">₹3,600</span>
+                    </div>
+                    <div class="menu-item-desc">Poached leeks, saffron shellfish reduction, and crispy sea asparagus.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="reserve-box">
+            <h2 class="serif" style="font-size:28px; margin-bottom:8px; color:var(--primary);">Evening Table Reservation</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Dinner seatings available at 07:00 PM and 09:30 PM. Smart elegant dress code required.</p>
+            <form onsubmit="handleReserve(event)">
+                <input type="text" class="form-control" id="rName" required placeholder="Guest Name">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <input type="date" class="form-control" required>
+                    <select class="form-control">
+                        <option>2 Guests</option>
+                        <option>4 Guests</option>
+                        <option>6 Guests (Private Alcove)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-gold" style="width:100%; padding:12px; margin-top:8px;">Confirm Table Reservation</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function handleReserve(e) {
+            e.preventDefault();
+            const name = document.getElementById('rName').value;
+            alert('Reservation Request Received for ' + name + '! Gourmet Haven Maître d' will contact you within 30 minutes to confirm your table.');
+        }
+    </script>
+</body>
+</html>
