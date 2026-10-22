@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RailYatra - Online Train Reservation System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🚆</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">RailYatra Express</span>
+          <span class="ml-2 text-xs bg-red-100 text-red-800 font-semibold px-2 py-0.5 rounded-full border border-red-200">Exp 04: Train Reservation</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleRole('passenger')" id="btnP" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600 text-white">Passenger Portal</button>
+        <button onclick="toggleRole('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Railway Admin</button>
+        <button onclick="openModal('pnrModal')" class="text-xs px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-red-700">Check PNR Status</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="passView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <!-- Search Trains -->
+    <div class="bg-gradient-to-r from-red-700 via-rose-700 to-red-900 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-2">Book Train Tickets, Check Via-Routes & Real-Time Availability</h2>
+      <p class="text-red-100 text-xs mb-4">Official reservation engine with PNR generation, class breakdown (1A, 2A, 3A, SL), and refund engine.</p>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-slate-800 bg-white p-4 rounded-xl">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Origin Station</label>
+          <select id="originStn" class="w-full border p-2 rounded-lg text-sm">
+            <option>NDLS - New Delhi</option>
+            <option>MAS - Chennai Central</option>
+            <option>SBC - KSR Bengaluru</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Destination Station</label>
+          <select id="destStn" class="w-full border p-2 rounded-lg text-sm">
+            <option>MAS - Chennai Central</option>
+            <option>NDLS - New Delhi</option>
+            <option>HWH - Howrah Jn</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Date of Journey</label>
+          <input type="date" id="journeyDate" value="2026-11-10" class="w-full border p-2 rounded-lg text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Class Type</label>
+          <select id="classType" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Classes</option>
+            <option value="1A">AC First Class (1A)</option>
+            <option value="2A">AC 2 Tier (2A)</option>
+            <option value="3A">AC 3 Tier (3A)</option>
+            <option value="SL">Sleeper (SL)</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="searchTrains()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-sm">Search Trains</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Train List Container -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-bold text-slate-900">Available Trains & Seat Availability</h3>
+      <div id="trainsContainer" class="space-y-4"></div>
+    </div>
+
+    <!-- My Tickets & Cancellation -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h4 class="font-bold text-slate-900">My Booked Tickets & PNR Directory</h4>
+          <p class="text-xs text-slate-500">Refund rules: >48 hrs before: 80% refund | 12-48 hrs: 50% refund | <12 hrs: 25% refund.</p>
+        </div>
+        <span class="text-xs bg-slate-100 text-slate-700 px-3 py-1 rounded-full font-bold">Logged In Passenger: Winston</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">PNR Number</th>
+              <th class="p-3">Train</th>
+              <th class="p-3">Passenger(s)</th>
+              <th class="p-3">Class</th>
+              <th class="p-3">Fare</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ticketsTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">Railway Admin Console: Schedule, Fares & PNR Maintenance</h3>
+        <p class="text-xs text-amber-700">Manage train schedules, zones, class fares, and process refund clearances.</p>
+      </div>
+      <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Admin Auth: Verified</span>
+    </div>
+
+    <!-- Add Train Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Add / Update Train Schedule & Fares</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Train No & Name</label>
+          <input id="admTrnName" value="12622 Tamil Nadu Express" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Zone / Route</label>
+          <input id="admTrnRoute" value="Southern Zone (NDLS - MAS)" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Departure & Arrival</label>
+          <input id="admTrnTimes" value="22:30 -> 07:10 (+1)" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Via-Stops</label>
+          <input id="admTrnVia" value="Bhopal, Nagpur, Vijayawada" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">3A Fare (Rs)</label>
+          <input id="admTrnFare3A" type="number" value="1850" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">SL Fare (Rs)</label>
+          <input id="admTrnFareSL" type="number" value="680" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="md:col-span-2 flex items-end">
+          <button onclick="adminAddTrain()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-xs">Add Schedule to Railway Master</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active PNR Auditing & Refund Approvals -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">All Active PNR Records & System Cancellations</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">PNR</th>
+              <th class="p-3">Train</th>
+              <th class="p-3">Passenger</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Refund Amount</th>
+              <th class="p-3 text-right">Admin Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminPnrTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Train Reservation Status Console</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX04</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[RAIL-SYS] Central Railway Reservation Terminal Active.</div>
+        <div>[PNR-ENGINE] 10-Digit PNR Generator and Status (Confirmed / RAC / Waiting List) Loaded.</div>
+        <div>[REFUND-RULES] Automated refund percentage calculated based on reservation vs journey timestamp.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book Ticket Modal -->
+  <div id="bookModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h3 id="bookTrainTitle" class="font-bold text-base text-slate-900">Passenger Details & Booking</h3>
+          <p id="bookTrainSubtitle" class="text-xs text-slate-500"></p>
+        </div>
+        <button onclick="closeModal('bookModal')" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs mb-4">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-500 mb-1">Passenger Name</label>
+            <input id="pName" value="Winston Yarraguntla" class="w-full border p-2 rounded-lg">
+          </div>
+          <div>
+            <label class="block text-slate-500 mb-1">Age & Gender</label>
+            <input id="pAge" value="21 / Male" class="w-full border p-2 rounded-lg">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-500 mb-1">Class Type</label>
+            <select id="pClass" onchange="updateFareCalc()" class="w-full border p-2 rounded-lg">
+              <option value="3A">AC 3 Tier (3A)</option>
+              <option value="2A">AC 2 Tier (2A)</option>
+              <option value="1A">AC First Class (1A)</option>
+              <option value="SL">Sleeper (SL)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-500 mb-1">Payment Mode</label>
+            <select id="pPayMode" class="w-full border p-2 rounded-lg">
+              <option>Online UPI / NetBanking</option>
+              <option>Offline Railway Counter / Cash</option>
+            </select>
+          </div>
+        </div>
+        <div class="bg-red-50 p-3 rounded-xl border border-red-200 flex justify-between items-center text-red-900 font-bold">
+          <span>Total Fare Amount:</span>
+          <span class="text-sm">Rs. <span id="calcFare">1850</span></span>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button onclick="closeModal('bookModal')" class="px-4 py-2 border rounded-lg text-xs font-semibold">Cancel</button>
+        <button onclick="confirmTrainBooking()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold">Generate PNR & Book</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PNR Status Modal -->
+  <div id="pnrModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <h3 class="font-bold text-base text-slate-900">Check PNR Status</h3>
+      <div>
+        <label class="block text-xs text-slate-500 mb-1">Enter 10-Digit PNR Number</label>
+        <input id="pnrInput" placeholder="e.g. 4829104859" class="w-full border p-2 rounded-lg text-sm font-mono">
+      </div>
+      <button onclick="queryPnr()" class="w-full bg-red-600 text-white font-bold py-2 rounded-lg text-xs">Verify PNR</button>
+      <div id="pnrResult" class="hidden p-3 bg-slate-50 border rounded-lg text-xs space-y-1"></div>
+      <button onclick="closeModal('pnrModal')" class="w-full border py-1.5 rounded-lg text-xs">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let trains = [
+      { no: "12622", name: "Tamil Nadu Superfast Express", route: "NDLS to MAS", dep: "22:30", arr: "07:10 (+1)", via: "Bhopal, Nagpur, Warangal, Vijayawada", avail: { "1A": "AVL 4", "2A": "AVL 14", "3A": "AVL 42", "SL": "WL 12" }, fare: { "1A": 3450, "2A": 2450, "3A": 1850, "SL": 680 } },
+      { no: "12244", name: "Vande Bharat Express", route: "MAS to SBC", dep: "05:50", arr: "10:20", via: "Katpadi Jn, Jolarpettai", avail: { "1A": "AVL 8", "2A": "AVL 28", "3A": "AVL 86", "SL": "NA" }, fare: { "1A": 2200, "2A": 1600, "3A": 950, "SL": 0 } },
+      { no: "12840", name: "Howrah Mail", route: "MAS to HWH", dep: "19:00", arr: "03:50 (+1)", via: "Rajahmundry, Visakhapatnam, Bhubaneswar", avail: { "1A": "WL 2", "2A": "RAC 6", "3A": "AVL 20", "SL": "AVL 95" }, fare: { "1A": 3100, "2A": 2150, "3A": 1620, "SL": 590 } }
+    ];
+
+    let pnrDatabase = [
+      { pnr: "4829104859", train: "12622 TN Express", passenger: "Winston Y.", date: "2026-11-10", cls: "3A", fare: 1850, status: "Confirmed", berth: "B3-42 (Side Lower)", refund: 0 }
+    ];
+
+    let currentTrain = null;
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderTrains() {
+      const c = document.getElementById('trainsContainer');
+      c.innerHTML = '';
+      trains.forEach(t => {
+        c.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-extrabold text-slate-900">${t.no} - ${t.name}</span>
+                  <span class="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-mono">${t.route}</span>
+                </div>
+                <div class="text-xs text-slate-500 mt-1">Route Via: <span class="text-slate-700 font-medium">${t.via}</span></div>
+              </div>
+              <div class="text-xs font-semibold text-slate-700">Dep: <span class="font-bold text-slate-900">${t.dep}</span> ➔ Arr: <span class="font-bold text-slate-900">${t.arr}</span></div>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t">
+              ${Object.keys(t.avail).map(cls => `
+                <div onclick="selectTrainForBooking('${t.no}', '${cls}')" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-300 cursor-pointer transition text-xs">
+                  <div class="flex justify-between font-bold text-slate-800">
+                    <span>Class ${cls}</span>
+                    <span class="text-red-700">Rs. ${t.fare[cls]}</span>
+                  </div>
+                  <div class="mt-1 font-semibold ${t.avail[cls].includes('AVL') ? 'text-emerald-600' : 'text-amber-600'}">${t.avail[cls]}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderTickets() {
+      const tb = document.getElementById('ticketsTable');
+      const atb = document.getElementById('adminPnrTable');
+      tb.innerHTML = '';
+      atb.innerHTML = '';
+      pnrDatabase.forEach(p => {
+        tb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-red-600">${p.pnr}</td>
+            <td class="p-3 font-semibold">${p.train}</td>
+            <td class="p-3">${p.passenger}</td>
+            <td class="p-3 font-bold">${p.cls}</td>
+            <td class="p-3">Rs. ${p.fare}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${p.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${p.status}</span></td>
+            <td class="p-3 text-right">
+              ${p.status === 'Confirmed' ? `<button onclick="cancelTrainTicket('${p.pnr}')" class="text-xs bg-rose-50 text-rose-700 hover:bg-rose-100 px-2.5 py-1 rounded-lg font-bold">Cancel Ticket</button>` : `<span class="text-xs text-slate-400">Refunded</span>`}
+            </td>
+          </tr>
+        `;
+
+        atb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold">${p.pnr}</td>
+            <td class="p-3">${p.train}</td>
+            <td class="p-3">${p.passenger}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${p.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${p.status}</span></td>
+            <td class="p-3 font-bold text-emerald-700">Rs. ${p.refund}</td>
+            <td class="p-3 text-right">
+              ${p.status === 'Cancelled' ? `<button onclick="passRefund('${p.pnr}')" class="text-xs bg-emerald-600 text-white px-2 py-1 rounded font-bold">Approve Refund</button>` : `<span class="text-xs text-slate-400">Active</span>`}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function selectTrainForBooking(trnNo, cls) {
+      currentTrain = trains.find(x => x.no === trnNo);
+      document.getElementById('bookTrainTitle').textContent = `${currentTrain.no} - ${currentTrain.name}`;
+      document.getElementById('bookTrainSubtitle').textContent = `Via: ${currentTrain.via}`;
+      document.getElementById('pClass').value = cls;
+      updateFareCalc();
+      openModal('bookModal');
+    }
+
+    function updateFareCalc() {
+      const cls = document.getElementById('pClass').value;
+      document.getElementById('calcFare').textContent = currentTrain.fare[cls] || 1500;
+    }
+
+    function confirmTrainBooking() {
+      const name = document.getElementById('pName').value;
+      const cls = document.getElementById('pClass').value;
+      const fare = currentTrain.fare[cls];
+      const pnr = "" + Math.floor(1000000000 + Math.random() * 9000000000);
+      const status = currentTrain.avail[cls].includes('AVL') ? "Confirmed" : "RAC";
+      pnrDatabase.push({ pnr, train: `${currentTrain.no} ${currentTrain.name}`, passenger: name, date: "2026-11-10", cls, fare, status, berth: `${cls}-24`, refund: 0 });
+      renderTickets();
+      closeModal('bookModal');
+      logOut(`[PNR GENERATED] 10-Digit PNR ${pnr} issued for Passenger ${name}. Status: ${status}. Fare: Rs. ${fare}. Sent to System Admin.`);
+      alert(`Booking Successful!\nGenerated PNR: ${pnr}\nStatus: ${status}\nFare: Rs. ${fare}`);
+    }
+
+    function cancelTrainTicket(pnr) {
+      const t = pnrDatabase.find(x => x.pnr === pnr);
+      if (t) {
+        // Refund rule: 80% if cancelled > 48h
+        const refundableAmt = Math.floor(t.fare * 0.80);
+        t.status = "Cancelled";
+        t.refund = refundableAmt;
+        renderTickets();
+        logOut(`[CANCELLATION PROCESSED] PNR ${pnr} cancelled. Refund Rule: 80% applicable. Refundable Amount: Rs. ${refundableAmt}. Dispatched to Admin.`);
+        alert(`PNR ${pnr} Cancelled.\nRefundable Amount (80% rule): Rs. ${refundableAmt}\nAdmin will process the refund shortly.`);
+      }
+    }
+
+    function passRefund(pnr) {
+      logOut(`[ADMIN REFUND] Administrator passed refundable amount for PNR ${pnr} back to passenger.`);
+      alert(`Refund for PNR ${pnr} successfully approved and credited!`);
+    }
+
+    function queryPnr() {
+      const pnr = document.getElementById('pnrInput').value;
+      const res = pnrDatabase.find(x => x.pnr === pnr);
+      const d = document.getElementById('pnrResult');
+      d.classList.remove('hidden');
+      if (res) {
+        d.innerHTML = `
+          <div class="font-bold text-red-700">PNR: ${res.pnr}</div>
+          <div>Train: ${res.train}</div>
+          <div>Passenger: ${res.passenger} (${res.cls})</div>
+          <div>Booking Status: <span class="font-bold ${res.status === 'Confirmed' ? 'text-emerald-600' : 'text-amber-600'}">${res.status}</span></div>
+          <div>Berth / Seat: ${res.berth}</div>
+        `;
+      } else {
+        d.innerHTML = `<span class="text-rose-600 font-bold">Invalid PNR Number or Record Not Found.</span>`;
+      }
+    }
+
+    function adminAddTrain() {
+      const name = document.getElementById('admTrnName').value;
+      const route = document.getElementById('admTrnRoute').value;
+      const times = document.getElementById('admTrnTimes').value;
+      const via = document.getElementById('admTrnVia').value;
+      const fare3A = parseInt(document.getElementById('admTrnFare3A').value);
+      const fareSL = parseInt(document.getElementById('admTrnFareSL').value);
+      const no = name.split(' ')[0];
+
+      trains.push({ no, name, route, dep: times.split('->')[0], arr: times.split('->')[1], via, avail: { "1A": "AVL 6", "2A": "AVL 16", "3A": "AVL 40", "SL": "AVL 80" }, fare: { "1A": fare3A * 1.8, "2A": fare3A * 1.3, "3A": fare3A, "SL": fareSL } });
+      renderTrains();
+      logOut(`[ADMIN SCHEDULE] Train ${name} on route ${route} added.`);
+      alert(`Train ${name} saved in Railway Master.`);
+    }
+
+    function searchTrains() {
+      const o = document.getElementById('originStn').value;
+      const d = document.getElementById('destStn').value;
+      const c = document.getElementById('classType').value;
+      logOut(`[SEARCH TRAINS] Query: ${o} -> ${d} | Class: ${c}. Available trains loaded.`);
+    }
+
+    function toggleRole(role) {
+      if (role === 'admin') {
+        document.getElementById('passView').classList.add('hidden');
+        document.getElementById('adminView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600 text-white';
+        document.getElementById('btnP').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+        logOut("[AUTH] Railway Controller Admin session active.");
+      } else {
+        document.getElementById('adminView').classList.add('hidden');
+        document.getElementById('passView').classList.remove('hidden');
+        document.getElementById('btnP').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600 text-white';
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+        logOut("[AUTH] Passenger view loaded.");
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    renderTrains();
+    renderTickets();
+  </script>
+</body>
+</html>

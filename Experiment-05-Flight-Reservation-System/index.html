@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroSky - Airline Flight Reservation System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">✈️</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">AeroSky Global Airways</span>
+          <span class="ml-2 text-xs bg-cyan-100 text-cyan-800 font-semibold px-2 py-0.5 rounded-full border border-cyan-200">Exp 05: Flight Reservation</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleFlightView('passenger')" id="btnP" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-600 text-white">Passenger Dashboard</button>
+        <button onclick="toggleFlightView('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Flight Admin</button>
+        <button onclick="openModal('feedbackModal')" class="text-xs px-3 py-1.5 bg-slate-100 rounded-lg hover:bg-slate-200">Customer Feedback</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="passFlightView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <!-- Flight Search Widget -->
+    <div class="bg-gradient-to-r from-cyan-700 via-sky-800 to-blue-900 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-2">Search Global Flights with Real-Time Seat Availability</h2>
+      <p class="text-cyan-100 text-xs mb-4">Consolidated airline inventory with live fare classes, e-ticket generation, and itinerary manager.</p>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-slate-800 bg-white p-4 rounded-xl">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Departure City</label>
+          <select id="flFrom" class="w-full border p-2 rounded-lg text-sm">
+            <option>DEL - New Delhi</option>
+            <option>BOM - Mumbai</option>
+            <option>MAA - Chennai</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Arrival Destination</label>
+          <select id="flTo" class="w-full border p-2 rounded-lg text-sm">
+            <option>DXB - Dubai</option>
+            <option>SIN - Singapore</option>
+            <option>LHR - London Heathrow</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Date</label>
+          <input type="date" id="flDate" value="2026-11-15" class="w-full border p-2 rounded-lg text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Travel Class</label>
+          <select id="flClass" class="w-full border p-2 rounded-lg text-sm">
+            <option>Economy</option>
+            <option>Premium Economy</option>
+            <option>Business Class</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="searchFlights()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg text-sm">Search Flights</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flight Search Results -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-bold text-slate-900">Available Flights</h3>
+      <div id="flightsContainer" class="space-y-4"></div>
+    </div>
+
+    <!-- My Tickets & Itineraries -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">My Booked Flights & E-Tickets</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">E-Ticket #</th>
+              <th class="p-3">Flight</th>
+              <th class="p-3">Route & Date</th>
+              <th class="p-3">Seat</th>
+              <th class="p-3">Class</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="flightTicketsTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminFlightView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">Airline Admin Operations & Report Portal</h3>
+        <p class="text-xs text-amber-700">Manage flight schedules, seat inventories, audit passenger accounts, and inspect load reports.</p>
+      </div>
+      <button onclick="adminFlightReport()" class="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold px-3 py-2 rounded-lg">Generate Flight Load Report</button>
+    </div>
+
+    <!-- Add Flight Schedule Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Add / Manage Flight Schedule</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Flight Number</label>
+          <input id="newFlNo" value="AS-904" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Origin -> Destination</label>
+          <input id="newFlRoute" value="DEL -> DXB" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Departure / Arrival</label>
+          <input id="newFlTimes" value="08:45 AM -> 11:20 AM" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Base Fare ($)</label>
+          <input id="newFlFare" type="number" value="380" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="md:col-span-4 flex justify-end">
+          <button onclick="adminAddFlight()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg text-xs">Add Schedule to Global Distribution System</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Global Distribution Console</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX05</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[GDS-CONNECTED] Global Airline Inventory Sync: 3 International Flights active.</div>
+        <div>[ETICKET-ENGINE] Printable E-Ticket and Itinerary generator online.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book Modal -->
+  <div id="flightBookModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-3 text-xs">
+      <h3 id="flModalTitle" class="font-bold text-base text-slate-900">Flight Booking & Seat Selection</h3>
+      <div>
+        <label class="block text-slate-500 mb-1">Passenger Full Name (as per Passport)</label>
+        <input id="flPassName" value="Winston Yarraguntla" class="w-full border p-2 rounded-lg">
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-slate-500 mb-1">Seat Number</label>
+          <select id="flSeatSelect" class="w-full border p-2 rounded-lg">
+            <option>12A (Window)</option>
+            <option>12B (Middle)</option>
+            <option>12C (Aisle)</option>
+            <option>14A (Window)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-500 mb-1">Travel Class</label>
+          <input id="flClassVal" value="Economy" readonly class="w-full border p-2 rounded-lg bg-slate-50">
+        </div>
+      </div>
+      <div class="bg-cyan-50 p-3 rounded-lg border border-cyan-200 text-cyan-900 font-bold flex justify-between">
+        <span>Total Fare Due:</span>
+        <span id="flFareDue">$380</span>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('flightBookModal')" class="px-4 py-2 border rounded-lg">Cancel</button>
+        <button onclick="completeFlightBooking()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-lg">Pay & Issue E-Ticket</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="feedbackModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-3 text-xs">
+      <h3 class="font-bold text-base text-slate-900">Customer Feedback & Reviews</h3>
+      <textarea id="feedbackText" rows="3" placeholder="How was your flight experience with AeroSky?" class="w-full border p-2 rounded-lg"></textarea>
+      <button onclick="submitFeedback()" class="w-full bg-cyan-600 text-white font-bold py-2 rounded-lg">Submit Feedback</button>
+      <button onclick="closeModal('feedbackModal')" class="w-full border py-1.5 rounded-lg">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let flightData = [
+      { no: "AS-201", route: "DEL -> DXB (Dubai)", dep: "08:15", arr: "10:45", seats: 28, fare: 320 },
+      { no: "AS-404", route: "DEL -> SIN (Singapore)", dep: "13:30", arr: "21:40", seats: 14, fare: 460 },
+      { no: "AS-708", route: "BOM -> LHR (London Heathrow)", dep: "02:15", arr: "07:30", seats: 6, fare: 720 }
+    ];
+
+    let userTickets = [
+      { ticketId: "ET-90218", flight: "AS-201 (DEL-DXB)", seat: "14A", date: "2026-11-15", cls: "Economy", status: "Confirmed" }
+    ];
+
+    let selectedFlight = null;
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderFlights() {
+      const c = document.getElementById('flightsContainer');
+      c.innerHTML = '';
+      flightData.forEach(f => {
+        c.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="font-bold text-base text-slate-900">${f.no}</span>
+                <span class="text-xs bg-cyan-50 text-cyan-700 px-2.5 py-0.5 rounded font-bold">${f.route}</span>
+              </div>
+              <div class="text-xs text-slate-500">Departure: <span class="font-bold text-slate-800">${f.dep}</span> | Arrival: <span class="font-bold text-slate-800">${f.arr}</span></div>
+            </div>
+            <div class="flex items-center gap-4 text-right">
+              <div>
+                <div class="text-xl font-extrabold text-cyan-600">$${f.fare}</div>
+                <div class="text-xs text-emerald-600 font-semibold">${f.seats} seats available</div>
+              </div>
+              <button onclick="openFlightBook('${f.no}')" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition">Book Flight</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderUserTickets() {
+      const tb = document.getElementById('flightTicketsTable');
+      tb.innerHTML = '';
+      userTickets.forEach(t => {
+        tb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-cyan-600">${t.ticketId}</td>
+            <td class="p-3 font-semibold">${t.flight}</td>
+            <td class="p-3">${t.date}</td>
+            <td class="p-3 font-bold">${t.seat}</td>
+            <td class="p-3">${t.cls}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${t.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${t.status}</span></td>
+            <td class="p-3 text-right space-x-2">
+              <button onclick="printTicket('${t.ticketId}')" class="text-xs bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg font-bold">Print E-Ticket</button>
+              ${t.status === 'Confirmed' ? `<button onclick="cancelFlightTicket('${t.ticketId}')" class="text-xs bg-rose-50 text-rose-700 px-2.5 py-1 rounded-lg font-bold">Cancel</button>` : ''}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function openFlightBook(flNo) {
+      selectedFlight = flightData.find(x => x.no === flNo);
+      document.getElementById('flModalTitle').textContent = `Book ${selectedFlight.no} - ${selectedFlight.route}`;
+      document.getElementById('flFareDue').textContent = "$" + selectedFlight.fare;
+      openModal('flightBookModal');
+    }
+
+    function completeFlightBooking() {
+      const name = document.getElementById('flPassName').value;
+      const seat = document.getElementById('flSeatSelect').value;
+      const tktId = "ET-" + Math.floor(10000 + Math.random() * 90000);
+      userTickets.push({ ticketId: tktId, flight: selectedFlight.no, seat, date: "2026-11-15", cls: "Economy", status: "Confirmed" });
+      selectedFlight.seats -= 1;
+      renderFlights();
+      renderUserTickets();
+      closeModal('flightBookModal');
+      logOut(`[E-TICKET ISSUED] Confirmation dispatched to ${name}. E-Ticket #${tktId}, Flight ${selectedFlight.no}, Seat ${seat}.`);
+      alert(`Flight Confirmed!\nE-Ticket: ${tktId}\nPassenger: ${name}\nSeat: ${seat}`);
+    }
+
+    function cancelFlightTicket(id) {
+      const t = userTickets.find(x => x.ticketId === id);
+      if (t) {
+        t.status = "Cancelled";
+        renderUserTickets();
+        logOut(`[TICKET CANCELLED] E-Ticket ${id} cancelled. Seat released back to GDS.`);
+        alert(`Flight Ticket ${id} cancelled.`);
+      }
+    }
+
+    function printTicket(id) {
+      logOut(`[PRINT TICKET] Rendering official boarding pass and e-ticket summary for ${id}.`);
+      alert(`[AeroSky Boarding Pass]\nTicket: ${id}\nStatus: Valid for Boarding\nGate opens 45 mins prior to departure.`);
+    }
+
+    function submitFeedback() {
+      const txt = document.getElementById('feedbackText').value;
+      if (!txt) return;
+      logOut(`[FEEDBACK SUBMITTED] Customer wrote: "${txt}"`);
+      closeModal('feedbackModal');
+      document.getElementById('feedbackText').value = '';
+      alert("Thank you for your valuable feedback!");
+    }
+
+    function searchFlights() {
+      const f = document.getElementById('flFrom').value;
+      const t = document.getElementById('flTo').value;
+      logOut(`[SEARCH FLIGHTS] Routing query: ${f} -> ${t}. Active inventories synced.`);
+    }
+
+    function adminAddFlight() {
+      const no = document.getElementById('newFlNo').value;
+      const route = document.getElementById('newFlRoute').value;
+      const times = document.getElementById('newFlTimes').value;
+      const fare = parseInt(document.getElementById('newFlFare').value);
+      flightData.push({ no, route, dep: times.split('->')[0].trim(), arr: times.split('->')[1].trim(), seats: 30, fare });
+      renderFlights();
+      logOut(`[ADMIN GDS INVENTORY] Flight ${no} scheduled on route ${route}.`);
+      alert(`Flight ${no} successfully listed!`);
+    }
+
+    function adminFlightReport() {
+      logOut(`[ADMIN REPORT] Fleet Capacity: ${flightData.length} active routes. Average load factor: 87.4%. Total revenue: $421,800.`);
+      alert("Fleet Occupancy & Revenue Report generated.");
+    }
+
+    function toggleFlightView(role) {
+      if (role === 'admin') {
+        document.getElementById('passFlightView').classList.add('hidden');
+        document.getElementById('adminFlightView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-600 text-white';
+        document.getElementById('btnP').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      } else {
+        document.getElementById('adminFlightView').classList.add('hidden');
+        document.getElementById('passFlightView').classList.remove('hidden');
+        document.getElementById('btnP').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-600 text-white';
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    renderFlights();
+    renderUserTickets();
+  </script>
+</body>
+</html>

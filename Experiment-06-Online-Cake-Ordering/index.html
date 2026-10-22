@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SweetDelight - Online Cake Ordering Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-rose-50/40 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-rose-100 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🎂</span>
+        <div>
+          <span class="font-bold text-lg text-rose-900">SweetDelight Cake Studio</span>
+          <span class="ml-2 text-xs bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded-full border border-rose-200">Exp 06: Cake Ordering</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleCakeView('student')" id="btnS" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-600 text-white">Student / User</button>
+        <button onclick="toggleCakeView('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Baker Admin</button>
+        <button onclick="openModal('cartModal')" class="relative text-xs px-3 py-1.5 bg-rose-50 text-rose-700 font-bold rounded-lg border border-rose-200">
+          🛒 Cart (<span id="cartCount">0</span>)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- STUDENT / USER VIEW -->
+  <main id="studentCakeView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <!-- Hero / Category Filter Bar -->
+    <div class="bg-gradient-to-r from-rose-500 via-pink-600 to-rose-700 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-2">Artisan Cakes for Birthdays, Weddings & Celebrations</h2>
+      <p class="text-rose-100 text-xs mb-4">Empowering rural bakers and developing communities to sell artisan confections globally.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white text-slate-800 p-4 rounded-xl">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Search Cake</label>
+          <input id="cakeSearchInput" onkeyup="filterCakes()" placeholder="e.g. Truffle, Red Velvet..." class="w-full border p-2 rounded-lg text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Category</label>
+          <select id="catFilter" onchange="filterCakes()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Categories</option>
+            <option value="Birthday">Birthday</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Anniversary">Anniversary</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Subcategory</label>
+          <select id="subCatFilter" onchange="filterCakes()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Flavors</option>
+            <option value="Chocolate">Chocolate</option>
+            <option value="Fruit">Fruit / Berry</option>
+            <option value="Vanilla">Vanilla</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Max Price Range</label>
+          <select id="priceFilter" onchange="filterCakes()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="9999">Any Price</option>
+            <option value="600">Under Rs. 600</option>
+            <option value="1200">Under Rs. 1200</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Freshly Baked Catalog</h3>
+      <div id="cakeGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- My Orders & Shipping Status -->
+    <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">My Orders & Live Shipping Status</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-rose-50/50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Order ID</th>
+              <th class="p-3">Cake Item</th>
+              <th class="p-3">Customization</th>
+              <th class="p-3">Shipping Address</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Invoice</th>
+            </tr>
+          </thead>
+          <tbody id="userOrdersTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminCakeView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-rose-100/60 border border-rose-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-rose-900">Cake Store Admin: Manage Products & Update Order Delivery</h3>
+        <p class="text-xs text-rose-700">Add new cakes, upload confections, set pricing, and modify shipping milestones.</p>
+      </div>
+      <span class="text-xs bg-rose-200 text-rose-900 font-bold px-3 py-1 rounded-full">Store Manager: Active</span>
+    </div>
+
+    <!-- Add Product Form -->
+    <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Post New Cake / Upload Product Details</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Cake Name</label>
+          <input id="admCakeName" value="Belgian Dark Truffle" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+          <select id="admCakeCat" class="w-full border p-2 rounded-lg text-xs">
+            <option>Birthday</option>
+            <option>Wedding</option>
+            <option>Anniversary</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Flavor / Sub-Category</label>
+          <select id="admCakeSub" class="w-full border p-2 rounded-lg text-xs">
+            <option>Chocolate</option>
+            <option>Fruit</option>
+            <option>Vanilla</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Price (Rs / kg)</label>
+          <input id="admCakePrice" type="number" value="750" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="md:col-span-3">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Product Description</label>
+          <input id="admCakeDesc" value="Layers of rich 70% dark Belgian cocoa ganache with roasted hazelnut crunch." class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="flex items-end">
+          <button onclick="adminAddCake()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 rounded-lg text-xs">Publish Cake</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Order Management Table -->
+    <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Customer Orders & Logistics Update</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Order ID</th>
+              <th class="p-3">Customer</th>
+              <th class="p-3">Item</th>
+              <th class="p-3">Current Status</th>
+              <th class="p-3 text-right">Update Status Milestone</th>
+            </tr>
+          </thead>
+          <tbody id="adminOrdersTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Cake Store Activity Console</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX06</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[CAKE-STORE] E-Commerce Confectionery Engine Online.</div>
+        <div>[SHIPPING-ENGINE] Real-time tracking: Order Placed -> Baking -> Out for Delivery -> Delivered.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div id="cartModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-base text-slate-900">Your Cake Cart & Customization</h3>
+        <button onclick="closeModal('cartModal')" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+
+      <div id="cartItemsList" class="space-y-3 text-xs max-h-48 overflow-y-auto"></div>
+
+      <!-- Shipping Address -->
+      <div class="space-y-2 text-xs border-t pt-3">
+        <h5 class="font-bold text-slate-800">Shipping Location & Message on Cake</h5>
+        <input id="shipAddr" placeholder="Delivery Address (Street, City, Pincode)" value="42 University Avenue, Chennai 600025" class="w-full border p-2 rounded-lg">
+        <input id="cakeMsg" placeholder="Custom Inscription on Cake (e.g. 'Happy 21st Birthday Winston!')" value="Happy Birthday!" class="w-full border p-2 rounded-lg">
+        <div class="flex justify-between font-bold text-sm bg-rose-50 p-3 rounded-lg text-rose-900">
+          <span>Total Cart Amount:</span>
+          <span id="cartTotal">Rs. 0</span>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button onclick="closeModal('cartModal')" class="px-4 py-2 border rounded-lg text-xs">Continue Shopping</button>
+        <button onclick="placeOrder()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs">Place Order</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let cakes = [
+      { id: 1, name: "Belgian Dark Chocolate Truffle", category: "Birthday", sub: "Chocolate", price: 750, img: "🍫", desc: "Decadent Dutch cocoa sponge coated with smooth chocolate ganache." },
+      { id: 2, name: "Fresh Strawberry Rose Gateau", category: "Anniversary", sub: "Fruit", price: 850, img: "🍓", desc: "Layers of vanilla sponge, fresh farm strawberries, and cream cheese." },
+      { id: 3, name: "Multi-Tier Floral Wedding Cake", category: "Wedding", sub: "Vanilla", price: 2400, img: "🍰", desc: "Elegant three-tier vanilla bean cake decorated with edible sugar florals." },
+      { id: 4, name: "Blueberry Bliss Cheesecake", category: "Birthday", sub: "Fruit", price: 620, img: "🫐", desc: "Cold-set New York style cheesecake topped with wild blueberry compote." }
+    ];
+
+    let cart = [];
+    let orders = [
+      { id: "CK-7712", item: "Belgian Dark Chocolate Truffle (1 kg)", custom: "Msg: 'Happy Birthday!'", address: "42 University Ave, Chennai", status: "Baking" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderCakes(list = cakes) {
+      const g = document.getElementById('cakeGrid');
+      g.innerHTML = '';
+      list.forEach(c => {
+        g.innerHTML += `
+          <div class="bg-white rounded-2xl border border-rose-100 overflow-hidden shadow-sm hover:shadow-md transition p-5 flex flex-col justify-between">
+            <div>
+              <div class="text-5xl mb-3 text-center">${c.img}</div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs bg-rose-50 text-rose-700 px-2 py-0.5 rounded font-bold">${c.category}</span>
+                <span class="text-xs text-slate-400 font-semibold">${c.sub}</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm mb-1">${c.name}</h4>
+              <p class="text-xs text-slate-500 mb-3">${c.desc}</p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-base font-extrabold text-rose-700">Rs. ${c.price}</span>
+                <select id="size_${c.id}" class="text-xs border p-1 rounded">
+                  <option value="1">1.0 kg</option>
+                  <option value="0.5">0.5 kg</option>
+                  <option value="2">2.0 kg</option>
+                </select>
+              </div>
+              <button onclick="addToCart(${c.id})" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 rounded-xl text-xs transition">Add to Cart</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderOrders() {
+      const ut = document.getElementById('userOrdersTable');
+      const at = document.getElementById('adminOrdersTable');
+      ut.innerHTML = '';
+      at.innerHTML = '';
+
+      orders.forEach(o => {
+        ut.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-rose-600">${o.id}</td>
+            <td class="p-3 font-semibold">${o.item}</td>
+            <td class="p-3 text-xs text-slate-500">${o.custom}</td>
+            <td class="p-3 text-xs">${o.address}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${o.status === 'Delivered' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${o.status}</span></td>
+            <td class="p-3 text-right"><button onclick="alert('Downloading invoice for order ${o.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">PDF</button></td>
+          </tr>
+        `;
+
+        at.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold">${o.id}</td>
+            <td class="p-3 text-xs">Student User</td>
+            <td class="p-3 font-medium">${o.item}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">${o.status}</span></td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="updateOrderStatus('${o.id}', 'Baking in Oven')" class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">Baking</button>
+              <button onclick="updateOrderStatus('${o.id}', 'Out for Delivery')" class="text-xs bg-blue-100 text-blue-800 hover:bg-blue-200 px-2 py-1 rounded">Out for Delivery</button>
+              <button onclick="updateOrderStatus('${o.id}', 'Delivered')" class="text-xs bg-emerald-600 text-white hover:bg-emerald-700 px-2 py-1 rounded font-bold">Delivered</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function addToCart(cakeId) {
+      const c = cakes.find(x => x.id === cakeId);
+      const size = parseFloat(document.getElementById(`size_${cakeId}`).value);
+      const itemPrice = Math.floor(c.price * size);
+      cart.push({ ...c, selectedSize: size, finalPrice: itemPrice });
+      document.getElementById('cartCount').textContent = cart.length;
+      logOut(`[CART ADD] ${c.name} (${size} kg) added. Price: Rs. ${itemPrice}.`);
+      alert(`${c.name} (${size} kg) added to cart!`);
+    }
+
+    function openCart() {
+      const list = document.getElementById('cartItemsList');
+      list.innerHTML = '';
+      let total = 0;
+      cart.forEach((item, idx) => {
+        total += item.finalPrice;
+        list.innerHTML += `
+          <div class="flex justify-between items-center border-b pb-2">
+            <div>
+              <div class="font-bold">${item.name} (${item.selectedSize} kg)</div>
+              <div class="text-slate-500">Rs. ${item.finalPrice}</div>
+            </div>
+            <button onclick="removeFromCart(${idx})" class="text-rose-600 font-bold hover:underline">Remove</button>
+          </div>
+        `;
+      });
+      document.getElementById('cartTotal').textContent = "Rs. " + total;
+      openModal('cartModal');
+    }
+
+    function removeFromCart(idx) {
+      cart.splice(idx, 1);
+      document.getElementById('cartCount').textContent = cart.length;
+      openCart();
+    }
+
+    function placeOrder() {
+      if (cart.length === 0) { alert("Cart is empty."); return; }
+      const addr = document.getElementById('shipAddr').value;
+      const msg = document.getElementById('cakeMsg').value;
+      const newOrderId = "CK-" + Math.floor(1000 + Math.random() * 9000);
+
+      const itemsSummary = cart.map(i => `${i.name} (${i.selectedSize}kg)`).join(', ');
+      orders.push({ id: newOrderId, item: itemsSummary, custom: `Msg: '${msg}'`, address: addr, status: "Order Placed" });
+      cart = [];
+      document.getElementById('cartCount').textContent = 0;
+      renderOrders();
+      closeModal('cartModal');
+      logOut(`[NEW ORDER] ${newOrderId} placed successfully for delivery to: ${addr}. Status: Order Placed.`);
+      alert(`Order ${newOrderId} successfully placed! Track live baking & shipping status.`);
+    }
+
+    function updateOrderStatus(id, newStatus) {
+      const o = orders.find(x => x.id === id);
+      if (o) {
+        o.status = newStatus;
+        renderOrders();
+        logOut(`[LOGISTICS UPDATE] Order ${id} milestone changed to: ${newStatus}. Notification SMS dispatched.`);
+      }
+    }
+
+    function adminAddCake() {
+      const name = document.getElementById('admCakeName').value;
+      const cat = document.getElementById('admCakeCat').value;
+      const sub = document.getElementById('admCakeSub').value;
+      const price = parseInt(document.getElementById('admCakePrice').value);
+      const desc = document.getElementById('admCakeDesc').value;
+
+      cakes.push({ id: cakes.length + 1, name, category: cat, sub, price, img: "🧁", desc });
+      renderCakes();
+      logOut(`[ADMIN CAKE POST] ${name} added to catalog in category: ${cat}.`);
+      alert(`${name} successfully published to store!`);
+    }
+
+    function filterCakes() {
+      const query = document.getElementById('cakeSearchInput').value.toLowerCase();
+      const cat = document.getElementById('catFilter').value;
+      const sub = document.getElementById('subCatFilter').value;
+      const maxPrice = parseFloat(document.getElementById('priceFilter').value);
+
+      const filtered = cakes.filter(c => {
+        const matchesName = c.name.toLowerCase().includes(query) || c.desc.toLowerCase().includes(query);
+        const matchesCat = (cat === 'All' || c.category === cat);
+        const matchesSub = (sub === 'All' || c.sub === sub);
+        const matchesPrice = c.price <= maxPrice;
+        return matchesName && matchesCat && matchesSub && matchesPrice;
+      });
+      renderCakes(filtered);
+    }
+
+    function toggleCakeView(role) {
+      if (role === 'admin') {
+        document.getElementById('studentCakeView').classList.add('hidden');
+        document.getElementById('adminCakeView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-600 text-white';
+        document.getElementById('btnS').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      } else {
+        document.getElementById('adminCakeView').classList.add('hidden');
+        document.getElementById('studentCakeView').classList.remove('hidden');
+        document.getElementById('btnS').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-600 text-white';
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      }
+    }
+
+    function openModal(id) {
+      if (id === 'cartModal') openCart();
+      else document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    renderCakes();
+    renderOrders();
+  </script>
+</body>
+</html>

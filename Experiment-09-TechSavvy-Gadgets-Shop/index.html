@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechSavvy - Electronic Gadgets E-Commerce</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">⚡</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">TechSavvy Electronics</span>
+          <span class="ml-2 text-xs bg-blue-100 text-blue-800 font-semibold px-2 py-0.5 rounded-full border border-blue-200">Exp 09: Tech E-Commerce</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTechView('customer')" id="btnCust" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white">Shopper</button>
+        <button onclick="toggleTechView('admin')" id="btnAdmin" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Inventory Admin</button>
+        <button onclick="openModal('cartModal')" class="relative text-xs px-3 py-1.5 bg-blue-50 text-blue-700 font-bold rounded-lg border border-blue-200">
+          🛒 Cart (<span id="cartCount">0</span>)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CUSTOMER STORE -->
+  <main id="custStoreView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <!-- Category & Search Bar -->
+    <div class="bg-slate-900 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-2">Smartphones, Laptops, Tablets & Wearable Gadgets</h2>
+      <p class="text-slate-400 text-xs mb-4">Discover next-gen electronics with exclusive online launch promotions.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white text-slate-800 p-4 rounded-xl">
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold text-slate-500 mb-1">Search Products</label>
+          <input id="techSearch" onkeyup="filterTech()" placeholder="Search gadgets, chips, specifications..." class="w-full border p-2 rounded-lg text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Primary Category</label>
+          <select id="techCat" onchange="filterTech()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Categories</option>
+            <option value="Smartphones">Smartphones</option>
+            <option value="Laptops">Laptops</option>
+            <option value="Tablets">Tablets</option>
+            <option value="Accessories">Accessories</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Max Price Range</label>
+          <select id="techPrice" onchange="filterTech()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="999999">Any Budget</option>
+            <option value="500">Under $500</option>
+            <option value="1200">Under $1,200</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Featured Electronics Catalog</h3>
+      <div id="techGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- Order Tracking & History -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">My Orders & Live Dispatch Status</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Order #</th>
+              <th class="p-3">Items</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Logistics Status</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="techOrdersTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN INVENTORY VIEW -->
+  <main id="adminStoreView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">Admin Inventory & Checkout Auditor</h3>
+        <p class="text-xs text-amber-700">Add particulars, modify product prices, update descriptions, and audit customers who checkout.</p>
+      </div>
+      <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Admin Auth: Verified</span>
+    </div>
+
+    <!-- Add Item Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Add / Modify Product Particulars</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Item Title</label>
+          <input id="admTechName" value="ProTab Ultra 12.9" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+          <select id="admTechCat" class="w-full border p-2 rounded-lg text-xs">
+            <option>Tablets</option>
+            <option>Smartphones</option>
+            <option>Laptops</option>
+            <option>Accessories</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Price ($)</label>
+          <input id="admTechPrice" type="number" value="899" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Stock</label>
+          <input id="admTechStock" type="number" value="25" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="md:col-span-3">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Description & Specs</label>
+          <input id="admTechDesc" value="OLED 120Hz display, M3 octa-core chip, 256GB storage, pencil support." class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="flex items-end">
+          <button onclick="adminAddGadget()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs">Publish Item</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customers Checkout Audit Log -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Customers Who Checked Out (Admin Audit Ledger)</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Order ID</th>
+              <th class="p-3">Customer Name</th>
+              <th class="p-3">Items Purchased</th>
+              <th class="p-3">Total Paid</th>
+              <th class="p-3 text-right">Dispatch Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminCheckoutTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / E-Commerce Transaction Console</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX09</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[SHOP-SYS] TechSavvy Catalog Engine Online: 4 Core Categories active.</div>
+        <div>[CHECKOUT-TRACKER] Order transaction lifecycle and audit recorder active.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div id="cartModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4 text-xs">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-base text-slate-900">Your Shopping Cart</h3>
+        <button onclick="closeModal('cartModal')" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+
+      <div id="cartItemsList" class="space-y-3 max-h-48 overflow-y-auto"></div>
+
+      <div class="border-t pt-3 flex justify-between items-center font-bold text-sm bg-blue-50 p-3 rounded-lg text-blue-900">
+        <span>Cart Subtotal:</span>
+        <span id="cartTotalAmt">$0</span>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button onclick="closeModal('cartModal')" class="px-4 py-2 border rounded-lg">Continue Shopping</button>
+        <button onclick="checkoutCart()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let products = [
+      { id: 1, name: "Nexus 15 Pro Smartphone", cat: "Smartphones", price: 899, rating: 4.8, stock: 18, img: "📱", desc: "6.7-inch Super AMOLED, 200MP camera, 5000mAh battery." },
+      { id: 2, name: "ZenithBook 14 AI Laptop", cat: "Laptops", price: 1299, rating: 4.9, stock: 12, img: "💻", desc: "Core Ultra 7, 32GB RAM, 1TB NVMe, 18-hour battery life." },
+      { id: 3, name: "AirPulse Noise-Canceling Buds", cat: "Accessories", price: 180, rating: 4.7, stock: 45, img: "🎧", desc: "Active Noise Cancellation with 36-hour playback time." },
+      { id: 4, name: "TabVision Pro 11-inch", cat: "Tablets", price: 549, rating: 4.6, stock: 8, img: "📟", desc: "2.8K resolution display with pressure-sensitive stylus." }
+    ];
+
+    let cart = [];
+    let orders = [
+      { id: "TS-8812", customer: "David Miller", items: "ZenithBook 14 AI Laptop (1x)", total: 1299, status: "Shipped via FedEx" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderProducts(list = products) {
+      const g = document.getElementById('techGrid');
+      g.innerHTML = '';
+      list.forEach(p => {
+        g.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="text-5xl mb-3 text-center">${p.img}</div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded">${p.cat}</span>
+                <span class="text-xs text-amber-500 font-bold">★ ${p.rating}</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm mt-1">${p.name}</h4>
+              <p class="text-xs text-slate-500 mt-1">${p.desc}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-base font-extrabold text-slate-900">$${p.price}</span>
+                <span class="text-xs text-emerald-600 font-semibold">${p.stock} in stock</span>
+              </div>
+              <button onclick="addToCart(${p.id})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition">Add to Cart</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderOrders() {
+      const tb = document.getElementById('techOrdersTable');
+      const atb = document.getElementById('adminCheckoutTable');
+      tb.innerHTML = '';
+      atb.innerHTML = '';
+
+      orders.forEach(o => {
+        tb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-blue-600">${o.id}</td>
+            <td class="p-3 font-medium">${o.items}</td>
+            <td class="p-3 font-bold">$${o.total}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">${o.status}</span></td>
+            <td class="p-3 text-right"><button onclick="alert('Tracking status for ${o.id}')" class="text-xs bg-slate-100 px-2.5 py-1 rounded font-bold">Track</button></td>
+          </tr>
+        `;
+
+        atb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold">${o.id}</td>
+            <td class="p-3 font-medium">${o.customer}</td>
+            <td class="p-3">${o.items}</td>
+            <td class="p-3 font-bold text-emerald-600">$${o.total}</td>
+            <td class="p-3 text-right">
+              <button onclick="updateLogistics('${o.id}')" class="text-xs bg-slate-800 text-white px-2.5 py-1 rounded font-bold">Update Logistics</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function addToCart(id) {
+      const p = products.find(x => x.id === id);
+      cart.push({ ...p });
+      document.getElementById('cartCount').textContent = cart.length;
+      logOut(`[CART ADD] ${p.name} added to cart. Subtotal: $${p.price}.`);
+      alert(`${p.name} added to shopping cart!`);
+    }
+
+    function openCart() {
+      const list = document.getElementById('cartItemsList');
+      list.innerHTML = '';
+      let total = 0;
+      cart.forEach((c, idx) => {
+        total += c.price;
+        list.innerHTML += `
+          <div class="flex justify-between items-center border-b pb-2">
+            <div>
+              <div class="font-bold">${c.name}</div>
+              <div class="text-slate-500">$${c.price}</div>
+            </div>
+            <button onclick="removeFromCart(${idx})" class="text-rose-600 font-bold hover:underline">Remove</button>
+          </div>
+        `;
+      });
+      document.getElementById('cartTotalAmt').textContent = "$" + total;
+      openModal('cartModal');
+    }
+
+    function removeFromCart(idx) {
+      cart.splice(idx, 1);
+      document.getElementById('cartCount').textContent = cart.length;
+      openCart();
+    }
+
+    function checkoutCart() {
+      if (cart.length === 0) { alert("Cart is empty."); return; }
+      const newId = "TS-" + Math.floor(1000 + Math.random() * 9000);
+      const total = cart.reduce((acc, c) => acc + c.price, 0);
+      const itemsList = cart.map(c => c.name).join(', ');
+      orders.push({ id: newId, customer: "Winston Yarraguntla", items: itemsList, total, status: "Payment Verified -> Dispatching" });
+      cart = [];
+      document.getElementById('cartCount').textContent = 0;
+      renderOrders();
+      closeModal('cartModal');
+      logOut(`[CHECKOUT COMPLETED] Order ${newId} verified for Winston Yarraguntla. Total: $${total}. Items: ${itemsList}.`);
+      alert(`Order ${newId} placed successfully!`);
+    }
+
+    function updateLogistics(id) {
+      const o = orders.find(x => x.id === id);
+      if (o) {
+        o.status = "Delivered to Customer";
+        renderOrders();
+        logOut(`[ADMIN DISPATCH] Order ${id} updated to Delivered.`);
+      }
+    }
+
+    function filterTech() {
+      const q = document.getElementById('techSearch').value.toLowerCase();
+      const cat = document.getElementById('techCat').value;
+      const max = parseFloat(document.getElementById('techPrice').value);
+
+      const f = products.filter(p => {
+        return (p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)) &&
+               (cat === 'All' || p.cat === cat) &&
+               p.price <= max;
+      });
+      renderProducts(f);
+    }
+
+    function adminAddGadget() {
+      const name = document.getElementById('admTechName').value;
+      const cat = document.getElementById('admTechCat').value;
+      const price = parseFloat(document.getElementById('admTechPrice').value);
+      const stock = parseInt(document.getElementById('admTechStock').value);
+      const desc = document.getElementById('admTechDesc').value;
+
+      products.push({ id: products.length + 1, name, cat, price, stock, rating: 5.0, img: "📦", desc });
+      renderProducts();
+      logOut(`[ADMIN INVENTORY ADD] ${name} (${cat}) added at $${price} (Stock: ${stock}).`);
+      alert(`${name} listed in inventory.`);
+    }
+
+    function toggleTechView(v) {
+      if (v === 'admin') {
+        document.getElementById('custStoreView').classList.add('hidden');
+        document.getElementById('adminStoreView').classList.remove('hidden');
+        document.getElementById('btnAdmin').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white';
+        document.getElementById('btnCust').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      } else {
+        document.getElementById('adminStoreView').classList.add('hidden');
+        document.getElementById('custStoreView').classList.remove('hidden');
+        document.getElementById('btnCust').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white';
+        document.getElementById('btnAdmin').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      }
+    }
+
+    function openModal(id) {
+      if (id === 'cartModal') openCart();
+      else document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    renderProducts();
+    renderOrders();
+  </script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StyleHub - Premier Online Fashion Retailer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">👗</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">StyleHub Fashion</span>
+          <span class="ml-2 text-xs bg-pink-100 text-pink-800 font-semibold px-2 py-0.5 rounded-full border border-pink-200">Exp 10: Fashion Retailer</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleFashionView('shopper')" id="btnSh" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-pink-600 text-white">Shopper</button>
+        <button onclick="toggleFashionView('admin')" id="btnAd" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Store Admin</button>
+        <button onclick="openModal('sizeGuideModal')" class="text-xs px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg">📏 Size Guide</button>
+        <button onclick="openModal('cartModal')" class="relative text-xs px-3 py-1.5 bg-pink-50 text-pink-700 font-bold rounded-lg border border-pink-200">
+          🛍️ Bag (<span id="cartCount">0</span>)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- SHOPPER VIEW -->
+  <main id="shopperView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-pink-600 via-rose-600 to-purple-700 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-2">Curated Apparel for Men, Women & Kids</h2>
+      <p class="text-pink-100 text-xs mb-4">Explore Seasonal Collections, Formal Attire, and Everyday Casual Wear.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white text-slate-800 p-4 rounded-xl">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Target Department</label>
+          <select id="fashDept" onchange="filterFashion()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Departments</option>
+            <option value="Women">Women</option>
+            <option value="Men">Men</option>
+            <option value="Kids">Children</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Collection Style</label>
+          <select id="fashStyle" onchange="filterFashion()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Collections</option>
+            <option value="Casual">Casual Wear</option>
+            <option value="Formal">Formal Attire</option>
+            <option value="Seasonal">Seasonal Winter/Summer</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Size Option</label>
+          <select id="fashSize" onchange="filterFashion()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Sizes</option>
+            <option value="S">Small (S)</option>
+            <option value="M">Medium (M)</option>
+            <option value="L">Large (L)</option>
+            <option value="XL">Extra Large (XL)</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="filterFashion()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 rounded-lg text-sm">Filter Outfits</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Latest Fashion Drops</h3>
+      <div id="fashionGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- Order Tracking & Return/Exchange Policy -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="md:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <h4 class="font-bold text-slate-900 mb-3">Order History & Tracking</h4>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+              <tr>
+                <th class="p-3">Order ID</th>
+                <th class="p-3">Outfit</th>
+                <th class="p-3">Size</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Return / Exchange</th>
+              </tr>
+            </thead>
+            <tbody id="fashionOrdersTable" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <h4 class="font-bold text-slate-900 mb-2">Easy 15-Day Return Policy</h4>
+          <p class="text-xs text-slate-600 mb-4">Hassle-free size exchange or instant store credit refund on all unworn items with tags.</p>
+          <div class="space-y-2 text-xs">
+            <input id="retOrderNo" placeholder="Enter Order ID (e.g. SH-401)" class="w-full border p-2 rounded-lg">
+            <select id="retReason" class="w-full border p-2 rounded-lg">
+              <option>Size too small / large</option>
+              <option>Color mismatch</option>
+              <option>Defective stitching</option>
+            </select>
+            <button onclick="requestReturn()" class="w-full bg-slate-800 text-white font-bold py-2 rounded-lg">Request Exchange / Return</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminFashionView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">StyleHub Fashion Admin & Checkout Monitor</h3>
+        <p class="text-xs text-amber-700">Add apparel particulars, modify prices, update catalog descriptions, and review customer checkout lists.</p>
+      </div>
+      <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Store Manager: Authenticated</span>
+    </div>
+
+    <!-- Add Apparel Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Add / Update Fashion Item</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Item Title</label>
+          <input id="admFashName" value="Italian Tailored Blazer" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Department</label>
+          <select id="admFashDept" class="w-full border p-2 rounded-lg text-xs">
+            <option>Men</option>
+            <option>Women</option>
+            <option>Kids</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Style Collection</label>
+          <select id="admFashStyle" class="w-full border p-2 rounded-lg text-xs">
+            <option>Formal</option>
+            <option>Casual</option>
+            <option>Seasonal</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Price ($)</label>
+          <input id="admFashPrice" type="number" value="185" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="md:col-span-3">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Description</label>
+          <input id="admFashDesc" value="Wool-blend slim fit jacket with satin lapels and breathable lining." class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="flex items-end">
+          <button onclick="adminAddFashion()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 rounded-lg text-xs">Publish Outfit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customers Checkout Ledger -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Customer Checkout Details Ledger</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Order ID</th>
+              <th class="p-3">Customer</th>
+              <th class="p-3">Apparel Items</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3 text-right">Logistics</th>
+            </tr>
+          </thead>
+          <tbody id="adminFashCheckoutTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Fashion Retail Activity Console</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX10</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[STYLEHUB] Fashion Retail Catalog Engine Initialized.</div>
+        <div>[RETURNS] 15-Day Return & Size Exchange validation online.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size Guide Modal -->
+  <div id="sizeGuideModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-3 text-xs">
+      <h3 class="font-bold text-base text-slate-900">Interactive Apparel Size Guide</h3>
+      <table class="w-full border text-center text-xs">
+        <tr class="bg-slate-100 font-bold"><td class="p-2 border">Size</td><td class="p-2 border">Chest (in)</td><td class="p-2 border">Waist (in)</td></tr>
+        <tr><td class="p-2 border font-bold">S</td><td class="p-2 border">36 - 38</td><td class="p-2 border">30 - 32</td></tr>
+        <tr><td class="p-2 border font-bold">M</td><td class="p-2 border">38 - 40</td><td class="p-2 border">32 - 34</td></tr>
+        <tr><td class="p-2 border font-bold">L</td><td class="p-2 border">40 - 42</td><td class="p-2 border">34 - 36</td></tr>
+        <tr><td class="p-2 border font-bold">XL</td><td class="p-2 border">42 - 45</td><td class="p-2 border">36 - 39</td></tr>
+      </table>
+      <button onclick="closeModal('sizeGuideModal')" class="w-full bg-slate-800 text-white py-2 rounded-lg font-bold">Got it</button>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div id="cartModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-3 text-xs">
+      <h3 class="font-bold text-base text-slate-900">Your Shopping Bag</h3>
+      <div id="cartItemsList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+      <div class="border-t pt-2 flex justify-between font-bold bg-pink-50 p-2.5 rounded text-pink-900">
+        <span>Subtotal:</span>
+        <span id="cartTotalAmt">$0</span>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('cartModal')" class="px-4 py-2 border rounded-lg">Cancel</button>
+        <button onclick="checkoutBag()" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-lg">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let fashionItems = [
+      { id: 1, name: "Silk Chiffon Maxi Dress", dept: "Women", style: "Casual", price: 110, icon: "👗", desc: "Floral printed breathable summer maxi with smocked bodice." },
+      { id: 2, name: "Tuxedo Formal Suit Set", dept: "Men", style: "Formal", price: 240, icon: "🤵", desc: "Midnight blue wool slim-cut two-piece formal evening suit." },
+      { id: 3, name: "Kids Quilted Puffer Jacket", dept: "Kids", style: "Seasonal", price: 65, icon: "🧥", desc: "Water-resistant thermal insulated jacket with fleece hood." },
+      { id: 4, name: "Linen Relaxed Casual Shirt", dept: "Men", style: "Casual", price: 55, icon: "👔", desc: "100% organic European flax linen button-down." }
+    ];
+
+    let cart = [];
+    let orders = [
+      { id: "SH-401", customer: "Emma Watson", items: "Silk Chiffon Maxi Dress (M)", total: 110, status: "Delivered" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderFashion(list = fashionItems) {
+      const g = document.getElementById('fashionGrid');
+      g.innerHTML = '';
+      list.forEach(item => {
+        g.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="text-5xl mb-3 text-center">${item.icon}</div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs bg-pink-50 text-pink-700 font-bold px-2 py-0.5 rounded">${item.dept}</span>
+                <span class="text-xs text-slate-400 font-semibold">${item.style}</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm mt-1">${item.name}</h4>
+              <p class="text-xs text-slate-500 mt-1">${item.desc}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-base font-extrabold text-slate-900">$${item.price}</span>
+                <select id="size_${item.id}" class="text-xs border p-1 rounded">
+                  <option>M</option>
+                  <option>S</option>
+                  <option>L</option>
+                  <option>XL</option>
+                </select>
+              </div>
+              <button onclick="addToBag(${item.id})" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 rounded-xl text-xs transition">Add to Bag</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderOrders() {
+      const tb = document.getElementById('fashionOrdersTable');
+      const atb = document.getElementById('adminFashCheckoutTable');
+      tb.innerHTML = '';
+      atb.innerHTML = '';
+
+      orders.forEach(o => {
+        tb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-pink-600">${o.id}</td>
+            <td class="p-3 font-semibold">${o.items}</td>
+            <td class="p-3 font-bold">Standard</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-pink-100 text-pink-800">${o.status}</span></td>
+            <td class="p-3 text-right"><button onclick="quickExchange('${o.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded font-bold">Exchange</button></td>
+          </tr>
+        `;
+
+        atb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold">${o.id}</td>
+            <td class="p-3 font-medium">${o.customer}</td>
+            <td class="p-3">${o.items}</td>
+            <td class="p-3 font-bold text-emerald-600">$${o.total}</td>
+            <td class="p-3 text-right"><span class="text-xs text-slate-500">Fulfilled</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    function addToBag(id) {
+      const item = fashionItems.find(x => x.id === id);
+      const size = document.getElementById(`size_${id}`).value;
+      cart.push({ ...item, chosenSize: size });
+      document.getElementById('cartCount').textContent = cart.length;
+      logOut(`[BAG ADD] ${item.name} (Size: ${size}) added. Price: $${item.price}.`);
+      alert(`${item.name} (${size}) added to your shopping bag!`);
+    }
+
+    function openBag() {
+      const list = document.getElementById('cartItemsList');
+      list.innerHTML = '';
+      let total = 0;
+      cart.forEach((c, idx) => {
+        total += c.price;
+        list.innerHTML += `
+          <div class="flex justify-between items-center border-b pb-2">
+            <div>
+              <div class="font-bold">${c.name} (Size: ${c.chosenSize})</div>
+              <div class="text-slate-500">$${c.price}</div>
+            </div>
+            <button onclick="cart.splice(${idx},1); document.getElementById('cartCount').textContent=cart.length; openBag();" class="text-rose-600 font-bold hover:underline">Remove</button>
+          </div>
+        `;
+      });
+      document.getElementById('cartTotalAmt').textContent = "$" + total;
+      openModal('cartModal');
+    }
+
+    function checkoutBag() {
+      if (cart.length === 0) return;
+      const newId = "SH-" + Math.floor(100 + Math.random() * 900);
+      const total = cart.reduce((acc, c) => acc + c.price, 0);
+      const itemsStr = cart.map(c => `${c.name} (${c.chosenSize})`).join(', ');
+      orders.push({ id: newId, customer: "Winston Yarraguntla", items: itemsStr, total, status: "Order Confirmed" });
+      cart = [];
+      document.getElementById('cartCount').textContent = 0;
+      renderOrders();
+      closeModal('cartModal');
+      logOut(`[CHECKOUT COMPLETE] Bag Order ${newId} confirmed ($${total}). Automated receipt emailed.`);
+      alert(`Order ${newId} placed successfully!`);
+    }
+
+    function requestReturn() {
+      const ord = document.getElementById('retOrderNo').value;
+      const reas = document.getElementById('retReason').value;
+      if (!ord) return;
+      logOut(`[RETURN INITIATED] Order ${ord} return/exchange request logged: "${reas}". Pre-paid shipping label generated.`);
+      alert(`Return request for ${ord} approved! Shipping label emailed.`);
+    }
+
+    function quickExchange(id) {
+      logOut(`[EXCHANGE] Quick size exchange requested for ${id}. Replacement dispatched.`);
+      alert(`Replacement order generated for ${id}.`);
+    }
+
+    function filterFashion() {
+      const d = document.getElementById('fashDept').value;
+      const s = document.getElementById('fashStyle').value;
+      const filtered = fashionItems.filter(i => {
+        return (d === 'All' || i.dept === d) && (s === 'All' || i.style === s);
+      });
+      renderFashion(filtered);
+    }
+
+    function adminAddFashion() {
+      const name = document.getElementById('admFashName').value;
+      const dept = document.getElementById('admFashDept').value;
+      const style = document.getElementById('admFashStyle').value;
+      const price = parseFloat(document.getElementById('admFashPrice').value);
+      const desc = document.getElementById('admFashDesc').value;
+
+      fashionItems.push({ id: fashionItems.length + 1, name, dept, style, price, icon: "🧥", desc });
+      renderFashion();
+      logOut(`[ADMIN APPAREL ADD] ${name} (${dept}/${style}) added at $${price}.`);
+      alert(`${name} published!`);
+    }
+
+    function toggleFashionView(v) {
+      if (v === 'admin') {
+        document.getElementById('shopperView').classList.add('hidden');
+        document.getElementById('adminFashionView').classList.remove('hidden');
+        document.getElementById('btnAd').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-pink-600 text-white';
+        document.getElementById('btnSh').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      } else {
+        document.getElementById('adminFashionView').classList.add('hidden');
+        document.getElementById('shopperView').classList.remove('hidden');
+        document.getElementById('btnSh').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-pink-600 text-white';
+        document.getElementById('btnAd').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      }
+    }
+
+    function openModal(id) {
+      if (id === 'cartModal') openBag();
+      else document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    renderFashion();
+    renderOrders();
+  </script>
+</body>
+</html>

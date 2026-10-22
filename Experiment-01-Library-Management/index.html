@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central Library Management System - CSA4308 Lab</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 600; }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+
+  <!-- Toast Notification System -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Header / Navbar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" id="navBrandBtn">
+          <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-blue-200">
+            📚
+          </div>
+          <div>
+            <span class="text-xl font-bold tracking-tight text-slate-900">LibCentral</span>
+            <span class="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200">CSA4308 Lab Ex 1</span>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="hidden md:flex items-center gap-1">
+          <button id="navCatalogBtn" class="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition">Book Catalog</button>
+          <button id="navMaterialsBtn" class="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition">Study Materials</button>
+          <button id="navContactBtn" class="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition">Contact & Help</button>
+        </nav>
+
+        <!-- User Controls / Auth State -->
+        <div class="flex items-center gap-3">
+          <!-- When Logged In -->
+          <div id="userBadge" class="hidden items-center gap-2">
+            <span id="roleBadgeSpan" class="text-xs font-semibold px-2.5 py-1 rounded-full"></span>
+            <span id="userNameSpan" class="text-sm font-semibold text-slate-700 hidden sm:inline"></span>
+            <button id="myDashboardBtn" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg transition">Dashboard</button>
+            <button id="logoutBtn" class="px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 transition">Logout</button>
+          </div>
+
+          <!-- When Logged Out -->
+          <div id="authButtons" class="flex items-center gap-2">
+            <button id="quickLoginAdminBtn" class="px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition">Admin Demo</button>
+            <button id="openLoginModalBtn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition">Sign In</button>
+            <button id="openRegisterModalBtn" class="px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition hidden sm:inline-block">Register</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- HERO BANNER (When on catalog or home) -->
+    <div id="heroSection" class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 rounded-2xl p-6 sm:p-10 text-white mb-8 shadow-lg relative overflow-hidden">
+      <div class="relative z-10 max-w-2xl">
+        <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm text-xs font-semibold rounded-full mb-3 tracking-wide uppercase">University Library Portal</span>
+        <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">Discover, Borrow & Excel in Your Academic Journey</h1>
+        <p class="text-blue-100 text-sm sm:text-base mb-6 leading-relaxed">
+          Access thousands of physical volumes, course textbooks, semester question banks, and research notes. Track your borrowings and clear fines online.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <button id="heroBrowseBtn" class="px-5 py-2.5 bg-white text-blue-800 font-semibold text-sm rounded-xl shadow-md hover:bg-blue-50 transition">Browse Catalog</button>
+          <button id="heroMaterialsBtn" class="px-5 py-2.5 bg-blue-600/60 border border-white/30 text-white font-semibold text-sm rounded-xl hover:bg-blue-600 transition">Course Materials</button>
+        </div>
+      </div>
+      <div class="absolute -right-10 -bottom-10 opacity-15 text-9xl select-none pointer-events-none">
+        📖
+      </div>
+    </div>
+
+    <!-- VIEW: CATALOG (DEFAULT VIEW) -->
+    <section id="viewCatalog" class="space-y-6">
+      <!-- Search & Filters -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
+        <div class="relative flex-1 w-full">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">🔍</span>
+          <input type="text" id="catalogSearchInput" placeholder="Search by title, author, category or ISBN..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+        </div>
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <select id="catalogCategoryFilter" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition w-1/2 md:w-48">
+            <option value="ALL">All Categories</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Information Technology">Information Tech</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="Management">Management</option>
+          </select>
+          <select id="catalogAvailabilityFilter" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition w-1/2 md:w-44">
+            <option value="ALL">All Availability</option>
+            <option value="AVAILABLE">In Stock Only</option>
+            <option value="ISSUED">Currently Issued</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Book Cards Grid -->
+      <div class="flex justify-between items-center">
+        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          Available Books <span id="catalogCountBadge" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold">0 items</span>
+        </h2>
+        <span class="text-xs text-slate-500">Click any book card to view full details or borrow</span>
+      </div>
+
+      <div id="catalogGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- VIEW: STUDY MATERIALS -->
+    <section id="viewMaterials" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Academic Study Materials</h2>
+            <p class="text-sm text-slate-500">Filter lecture notes, lab manuals, and question banks by Academic Year & Semester.</p>
+          </div>
+          <div class="flex gap-2">
+            <select id="matYearFilter" class="px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:ring-2 focus:ring-blue-500">
+              <option value="ALL">All Years</option>
+              <option value="1">Year 1</option>
+              <option value="2">Year 2</option>
+              <option value="3">Year 3</option>
+              <option value="4">Year 4</option>
+            </select>
+            <select id="matSemFilter" class="px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:ring-2 focus:ring-blue-500">
+              <option value="ALL">All Semesters</option>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold text-xs border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3">Subject & Title</th>
+                <th class="px-4 py-3">Year / Sem</th>
+                <th class="px-4 py-3">Type</th>
+                <th class="px-4 py-3">Format & Size</th>
+                <th class="px-4 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="materialsTableBody" class="divide-y divide-slate-100">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: CONTACT & FEEDBACK -->
+    <section id="viewContact" class="hidden max-w-3xl mx-auto space-y-6">
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg">
+            ✉️
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Library Helpdesk & Contact Form</h2>
+            <p class="text-xs text-slate-500">Have queries about borrowing, return deadlines, or study resources? Send us a message.</p>
+          </div>
+        </div>
+
+        <form id="contactForm" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Your Full Name</label>
+              <input type="text" id="contactName" required placeholder="John Doe" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">College Email / Student ID</label>
+              <input type="email" id="contactEmail" required placeholder="student@college.edu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Subject</label>
+            <input type="text" id="contactSubject" required placeholder="Book renewal inquiry / Fine verification" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Message Description</label>
+            <textarea id="contactMessage" rows="4" required placeholder="Describe your query or request details here..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+          </div>
+          <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl shadow transition">Submit Inquiry</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW: STUDENT / USER DASHBOARD -->
+    <section id="viewUserDashboard" class="hidden space-y-6">
+      <!-- Profile Header Card -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-2xl shadow-md">
+            🎓
+          </div>
+          <div>
+            <h2 id="userDashName" class="text-xl font-bold text-slate-900">Student Profile</h2>
+            <p id="userDashMeta" class="text-sm text-slate-500">Department of Computer Science & Engineering | Year 3, Sem 6</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <span class="text-xs text-slate-400 font-medium block">Total Pending Fine</span>
+            <span id="userTotalFineText" class="text-xl font-black text-rose-600">₹0.00</span>
+          </div>
+          <button id="payFineBtn" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs rounded-xl shadow transition">Clear Fine</button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs for Student -->
+      <div class="flex border-b border-slate-200 bg-white px-4 rounded-xl gap-6">
+        <button id="tabUserHistory" class="py-3 text-sm font-semibold tab-active transition">Borrow History & Due Dates</button>
+        <button id="tabUserProfile" class="py-3 text-sm font-semibold text-slate-500 hover:text-blue-600 transition">My Profile Details</button>
+      </div>
+
+      <!-- Tab Content: Borrow History -->
+      <div id="userHistoryPanel" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900 mb-4">My Issued Books & Past Loans</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold text-xs border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3">Book Title & Author</th>
+                <th class="px-4 py-3">Issue Date</th>
+                <th class="px-4 py-3">Expiry / Due Date</th>
+                <th class="px-4 py-3">Return Status</th>
+                <th class="px-4 py-3">Fine (₹5/day overdue)</th>
+              </tr>
+            </thead>
+            <tbody id="userHistoryTableBody" class="divide-y divide-slate-100">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab Content: Profile Update Form -->
+      <div id="userProfilePanel" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-2xl">
+        <h3 class="text-base font-bold text-slate-900 mb-4">Update Profile Information</h3>
+        <form id="userProfileForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Student Name</label>
+            <input type="text" id="profName" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Email Address</label>
+            <input type="email" id="profEmail" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm" disabled>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Academic Year</label>
+              <select id="profYear" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+                <option value="1">Year 1</option>
+                <option value="2">Year 2</option>
+                <option value="3">Year 3</option>
+                <option value="4">Year 4</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Semester</label>
+              <select id="profSem" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+                <option value="1">Sem 1</option>
+                <option value="2">Sem 2</option>
+                <option value="3">Sem 3</option>
+                <option value="4">Sem 4</option>
+                <option value="5">Sem 5</option>
+                <option value="6">Sem 6</option>
+                <option value="7">Sem 7</option>
+                <option value="8">Sem 8</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Department</label>
+            <input type="text" id="profDept" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+          </div>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl shadow transition">Save Profile Changes</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW: LIBRARIAN ADMIN DASHBOARD -->
+    <section id="viewAdminDashboard" class="hidden space-y-6">
+      <!-- Admin Top Metrics Bar -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Total Catalog Books</span>
+          <span id="metricTotalBooks" class="text-2xl font-black text-slate-900 mt-1 block">0</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Currently Issued</span>
+          <span id="metricIssuedBooks" class="text-2xl font-black text-amber-600 mt-1 block">0</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Active Overdue Loans</span>
+          <span id="metricOverdueLoans" class="text-2xl font-black text-rose-600 mt-1 block">0</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Total Outstanding Fines</span>
+          <span id="metricTotalFines" class="text-2xl font-black text-emerald-600 mt-1 block">₹0</span>
+        </div>
+      </div>
+
+      <!-- Admin Tabs -->
+      <div class="flex flex-wrap border-b border-slate-200 bg-white px-4 rounded-xl gap-4 sm:gap-6">
+        <button id="adminTabInventory" class="py-3 text-sm font-semibold tab-active transition">Manage Book Inventory</button>
+        <button id="adminTabIssueReturn" class="py-3 text-sm font-semibold text-slate-500 hover:text-blue-600 transition">Issue & Return Desk</button>
+        <button id="adminTabFines" class="py-3 text-sm font-semibold text-slate-500 hover:text-blue-600 transition">Fine Management</button>
+        <button id="adminTabMaterials" class="py-3 text-sm font-semibold text-slate-500 hover:text-blue-600 transition">Upload/Update Materials</button>
+      </div>
+
+      <!-- Tab 1: Book Inventory (Add / Update / Delete) -->
+      <div id="adminPanelInventory" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <h3 class="text-base font-bold text-slate-900">Book Inventory Master</h3>
+          <button id="openAddBookModalBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow flex items-center gap-1.5 transition">
+            <span>+</span> Add New Book
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold text-xs border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3">Title & Author</th>
+                <th class="px-4 py-3">ISBN</th>
+                <th class="px-4 py-3">Category</th>
+                <th class="px-4 py-3">Total / Avail</th>
+                <th class="px-4 py-3">Rack No.</th>
+                <th class="px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminInventoryTableBody" class="divide-y divide-slate-100">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 2: Issue Book & Return Desk -->
+      <div id="adminPanelIssueReturn" class="hidden space-y-6">
+        <!-- Issue Form -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-4">Issue Book to Registered Student</h3>
+          <form id="issueBookForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Select Student</label>
+              <select id="issueStudentSelect" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+                <!-- Loaded from student list -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Select Available Book</label>
+              <select id="issueBookSelect" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+                <!-- Loaded from available books -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Loan Period (Days)</label>
+              <input type="number" id="issueDurationDays" value="14" min="1" max="60" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+            </div>
+            <div>
+              <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow transition">Confirm Issue</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Active Issues Table -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-4">Active & Returned Book Records</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 uppercase font-semibold text-xs border-b border-slate-200">
+                <tr>
+                  <th class="px-4 py-3">Student Name</th>
+                  <th class="px-4 py-3">Book Title</th>
+                  <th class="px-4 py-3">Issue Date</th>
+                  <th class="px-4 py-3">Due Date</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Calculated Fine</th>
+                  <th class="px-4 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminIssuedTableBody" class="divide-y divide-slate-100">
+                <!-- Loaded via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Fine Management -->
+      <div id="adminPanelFines" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Fine Assessment & Collection Rules</h3>
+            <p class="text-xs text-slate-500">Fine rate: ₹5.00 per overdue day calculated automatically past the due date.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-semibold text-slate-700">Per Day Rate (₹):</label>
+            <input type="number" id="adminFineRateInput" value="5" min="1" max="50" class="w-20 px-2 py-1 rounded-lg border border-slate-200 text-sm">
+            <button id="saveFineRateBtn" class="px-3 py-1 bg-slate-800 text-white rounded-lg text-xs font-semibold hover:bg-slate-700 transition">Update</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold text-xs border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3">Student Name & Email</th>
+                <th class="px-4 py-3">Book Overdue</th>
+                <th class="px-4 py-3">Days Overdue</th>
+                <th class="px-4 py-3">Fine Amount</th>
+                <th class="px-4 py-3">Fine Status</th>
+                <th class="px-4 py-3 text-right">Collect Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminFineTableBody" class="divide-y divide-slate-100">
+              <!-- Loaded via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 4: Materials Upload (Year & Semester Wise) -->
+      <div id="adminPanelMaterials" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-4">Upload / Update Study Material (Year & Semester Wise)</h3>
+          <form id="addMaterialForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Subject Name</label>
+              <input type="text" id="matSubject" required placeholder="Internet Programming (CS8661)" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Resource Title / Topic</label>
+              <input type="text" id="matTitle" required placeholder="Unit 1 - HTML5, CSS3, DOM Complete Notes" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Material Type</label>
+              <select id="matTypeSelect" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+                <option value="Lecture Notes">Lecture Notes</option>
+                <option value="Lab Manual">Lab Manual</option>
+                <option value="Question Bank">Question Bank</option>
+                <option value="Syllabus Copy">Syllabus Copy</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Academic Year</label>
+              <select id="matYearSelect" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+                <option value="1">Year 1</option>
+                <option value="2">Year 2</option>
+                <option value="3" selected>Year 3</option>
+                <option value="4">Year 4</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Semester</label>
+              <select id="matSemSelect" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6" selected>Semester 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">File Format / Size</label>
+              <input type="text" id="matSize" value="PDF (3.2 MB)" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+            </div>
+            <div class="sm:col-span-2 lg:col-span-3">
+              <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow transition">Save & Publish Material</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-4">Published Course Materials</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-slate-700 uppercase font-semibold text-xs border-b border-slate-200">
+                <tr>
+                  <th class="px-4 py-3">Title & Subject</th>
+                  <th class="px-4 py-3">Year / Sem</th>
+                  <th class="px-4 py-3">Category</th>
+                  <th class="px-4 py-3">Format</th>
+                  <th class="px-4 py-3 text-right">Delete</th>
+                </tr>
+              </thead>
+              <tbody id="adminMaterialsTableBody" class="divide-y divide-slate-100">
+                <!-- Loaded via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="font-medium text-slate-700">Central Library Automation & Management Portal</p>
+      <p class="mt-1">Course: CSA4308 Internet Programming Lab • Experiment #1</p>
+    </div>
+  </footer>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- MODAL: LOGIN -->
+  <div id="loginModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+      <button id="closeLoginModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+      <h3 class="text-xl font-bold text-slate-900 mb-1">Account Sign In</h3>
+      <p class="text-xs text-slate-500 mb-5">Login as a Student or Library Administrator</p>
+
+      <!-- Role Selector -->
+      <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl mb-4 text-xs font-semibold">
+        <button id="loginRoleUserBtn" type="button" class="py-2 rounded-lg bg-white shadow-sm text-blue-600 transition">Student / User</button>
+        <button id="loginRoleAdminBtn" type="button" class="py-2 rounded-lg text-slate-600 transition">Librarian Admin</button>
+      </div>
+
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Email or Username</label>
+          <input type="text" id="loginEmail" required placeholder="admin or student@college.edu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Password</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500">
+          <p id="adminCredentialHint" class="hidden text-xs text-purple-600 mt-1">Hint: Use <strong>admin</strong> / <strong>admin123</strong></p>
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow transition">Log In to Library</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTER -->
+  <div id="registerModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+      <button id="closeRegisterModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+      <h3 class="text-xl font-bold text-slate-900 mb-1">Student Registration</h3>
+      <p class="text-xs text-slate-500 mb-4">Create your library borrower profile</p>
+
+      <form id="registerForm" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Full Name</label>
+          <input type="text" id="regName" required placeholder="Alex Morgan" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">College Email</label>
+          <input type="email" id="regEmail" required placeholder="alex@college.edu" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Password</label>
+          <input type="password" id="regPassword" required placeholder="••••••••" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Year</label>
+            <select id="regYear" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+              <option value="1">Year 1</option>
+              <option value="2">Year 2</option>
+              <option value="3" selected>Year 3</option>
+              <option value="4">Year 4</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Semester</label>
+            <select id="regSem" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+              <option value="1">Sem 1</option>
+              <option value="2">Sem 2</option>
+              <option value="3">Sem 3</option>
+              <option value="4">Sem 4</option>
+              <option value="5">Sem 5</option>
+              <option value="6" selected>Sem 6</option>
+              <option value="7">Sem 7</option>
+              <option value="8">Sem 8</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Department</label>
+          <input type="text" id="regDept" value="Computer Science & Engineering" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow transition mt-2">Complete Registration</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: BOOK DETAILS -->
+  <div id="bookDetailsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
+      <button id="closeBookDetailsBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+      <div class="flex gap-4 mb-4">
+        <div id="modalBookIcon" class="w-16 h-20 rounded-xl bg-blue-100 flex items-center justify-center text-3xl font-bold text-blue-600 shadow-inner">
+          📖
+        </div>
+        <div>
+          <span id="modalBookCategory" class="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full"></span>
+          <h3 id="modalBookTitle" class="text-lg font-bold text-slate-900 mt-1"></h3>
+          <p id="modalBookAuthor" class="text-xs text-slate-500"></p>
+        </div>
+      </div>
+
+      <div class="space-y-2 text-xs border-y border-slate-100 py-3 mb-4">
+        <div class="flex justify-between">
+          <span class="text-slate-400">ISBN Code:</span>
+          <span id="modalBookISBN" class="font-medium text-slate-700"></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Shelf Location:</span>
+          <span id="modalBookRack" class="font-medium text-slate-700"></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Total Copies:</span>
+          <span id="modalBookTotal" class="font-medium text-slate-700"></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Available to Issue:</span>
+          <span id="modalBookAvail" class="font-bold text-emerald-600"></span>
+        </div>
+      </div>
+
+      <p id="modalBookDesc" class="text-xs text-slate-600 mb-5 leading-relaxed"></p>
+
+      <div class="flex justify-end gap-2">
+        <button id="modalBorrowActionBtn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow transition">Request / Borrow Book</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT BOOK (ADMIN) -->
+  <div id="bookAdminModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+      <button id="closeBookAdminModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+      <h3 id="bookAdminModalTitle" class="text-lg font-bold text-slate-900 mb-1">Add New Book to Inventory</h3>
+      <p class="text-xs text-slate-500 mb-4">Fill out the book catalog details</p>
+
+      <form id="bookAdminForm" class="space-y-3">
+        <input type="hidden" id="editBookId">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Book Title</label>
+          <input type="text" id="adminBookTitle" required placeholder="Internet & World Wide Web How to Program" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Author Name(s)</label>
+          <input type="text" id="adminBookAuthor" required placeholder="Paul Deitel, Harvey Deitel" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">ISBN</label>
+            <input type="text" id="adminBookISBN" required placeholder="978-0132151009" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Category</label>
+            <select id="adminBookCategory" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Technology">Information Tech</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Management">Management</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Quantity</label>
+            <input type="number" id="adminBookQty" value="5" min="1" max="100" required class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Rack Location</label>
+            <input type="text" id="adminBookRack" value="Rack CS-04" required class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Short Description</label>
+          <textarea id="adminBookDesc" rows="2" placeholder="Comprehensive guide to modern web technologies..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm"></textarea>
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow transition mt-2">Save to Catalog</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // State Persistence
+    const STORAGE_KEY = 'LIB_CENTRAL_DATA_V1';
+
+    const defaultData = {
+      currentUser: null, // { role: 'admin'|'user', name, email, year, sem, dept }
+      fineRatePerDay: 5,
+      books: [
+        {
+          id: 'B001',
+          title: 'Internet & World Wide Web: How to Program',
+          author: 'Harvey M. Deitel, Paul J. Deitel',
+          isbn: '978-0132151009',
+          category: 'Computer Science',
+          quantity: 5,
+          available: 3,
+          rack: 'Rack CS-02',
+          description: 'A comprehensive introduction to internet and client/server programming using HTML5, CSS3, JavaScript, XML, and PHP.'
+        },
+        {
+          id: 'B002',
+          title: 'Full Stack Development with Node.js & React',
+          author: 'Robin Wieruch',
+          isbn: '978-1789805901',
+          category: 'Information Technology',
+          quantity: 4,
+          available: 4,
+          rack: 'Rack IT-01',
+          description: 'Step-by-step masterclass in creating responsive single-page web applications with modern frontend frameworks and RESTful APIs.'
+        },
+        {
+          id: 'B003',
+          title: 'Database System Concepts (7th Edition)',
+          author: 'Abraham Silberschatz, Henry Korth',
+          isbn: '978-0078022159',
+          category: 'Computer Science',
+          quantity: 6,
+          available: 2,
+          rack: 'Rack DB-05',
+          description: 'Standard textbook on relational model, SQL queries, transaction management, indexing, and storage engines.'
+        },
+        {
+          id: 'B004',
+          title: 'Discrete Mathematics and Its Applications',
+          author: 'Kenneth H. Rosen',
+          isbn: '978-1259676512',
+          category: 'Mathematics',
+          quantity: 3,
+          available: 1,
+          rack: 'Rack MA-03',
+          description: 'Fundamental discrete math concepts for computer science including propositional logic, graph theory, and combinatorics.'
+        },
+        {
+          id: 'B005',
+          title: 'Signals and Systems',
+          author: 'Alan V. Oppenheim, Alan S. Willsky',
+          isbn: '978-0138147570',
+          category: 'Electronics',
+          quantity: 4,
+          available: 3,
+          rack: 'Rack EC-01',
+          description: 'Continuous and discrete-time signals, Fourier analysis, Laplace transforms, and linear time-invariant systems.'
+        }
+      ],
+      materials: [
+        {
+          id: 'M001',
+          subject: 'Internet Programming (CS8661)',
+          title: 'Lab Manual - Complete Experiments 1 to 10',
+          year: '3',
+          sem: '6',
+          type: 'Lab Manual',
+          format: 'PDF (2.8 MB)'
+        },
+        {
+          id: 'M002',
+          subject: 'Internet Programming (CS8661)',
+          title: 'Unit 1 & 2 Complete Lecture Notes (HTML5, CSS, JS)',
+          year: '3',
+          sem: '6',
+          type: 'Lecture Notes',
+          format: 'PDF (4.1 MB)'
+        },
+        {
+          id: 'M003',
+          subject: 'Database Management Systems',
+          title: 'Previous 5 Years University Solved Question Bank',
+          year: '2',
+          sem: '4',
+          type: 'Question Bank',
+          format: 'PDF (3.5 MB)'
+        },
+        {
+          id: 'M004',
+          subject: 'Engineering Mathematics III',
+          title: 'Transforms and Partial Differential Equations Notes',
+          year: '2',
+          sem: '3',
+          type: 'Lecture Notes',
+          format: 'PDF (5.2 MB)'
+        }
+      ],
+      users: [
+        {
+          name: 'Praveen Kumar',
+          email: 'praveen@college.edu',
+          password: 'user123',
+          role: 'user',
+          year: '3',
+          sem: '6',
+          dept: 'Computer Science & Engineering'
+        },
+        {
+          name: 'Ananya Sharma',
+          email: 'ananya@college.edu',
+          password: 'user123',
+          role: 'user',
+          year: '3',
+          sem: '6',
+          dept: 'Information Technology'
+        }
+      ],
+      issues: [
+        {
+          id: 'ISS001',
+          studentEmail: 'praveen@college.edu',
+          studentName: 'Praveen Kumar',
+          bookId: 'B001',
+          bookTitle: 'Internet & World Wide Web: How to Program',
+          issueDate: '2026-09-15',
+          dueDate: '2026-09-29',
+          status: 'ISSUED', // 'ISSUED' | 'RETURNED'
+          returnDate: null,
+          fineAmount: 25,
+          fineStatus: 'UNPAID' // 'UNPAID' | 'PAID'
+        },
+        {
+          id: 'ISS002',
+          studentEmail: 'praveen@college.edu',
+          studentName: 'Praveen Kumar',
+          bookId: 'B003',
+          bookTitle: 'Database System Concepts (7th Edition)',
+          issueDate: '2026-10-01',
+          dueDate: '2026-10-15',
+          status: 'ISSUED',
+          returnDate: null,
+          fineAmount: 35,
+          fineStatus: 'UNPAID'
+        },
+        {
+          id: 'ISS003',
+          studentEmail: 'ananya@college.edu',
+          studentName: 'Ananya Sharma',
+          bookId: 'B004',
+          bookTitle: 'Discrete Mathematics and Its Applications',
+          issueDate: '2026-09-01',
+          dueDate: '2026-09-15',
+          status: 'RETURNED',
+          returnDate: '2026-09-14',
+          fineAmount: 0,
+          fineStatus: 'PAID'
+        }
+      ]
+    };
+
+    let appState = {};
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      appState = stored ? JSON.parse(stored) : defaultData;
+    } catch (e) {
+      appState = defaultData;
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        console.error('Local storage unavailable');
+      }
+    }
+
+    // Toast Helper
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-emerald-600 text-white',
+        error: 'bg-rose-600 text-white',
+        info: 'bg-slate-900 text-white',
+        warning: 'bg-amber-600 text-white'
+      };
+      toast.className = `${colors[type] || colors.info} px-4 py-3 rounded-xl shadow-lg text-sm flex items-center justify-between gap-3 pointer-events-auto transform transition duration-300 translate-y-2 opacity-0`;
+      toast.innerHTML = `<span>${message}</span><button class="text-xs opacity-75 hover:opacity-100 font-bold ml-2">✕</button>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      toast.querySelector('button').addEventListener('click', () => {
+        toast.remove();
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Switch Main Views
+    function switchView(viewName) {
+      const views = ['viewCatalog', 'viewMaterials', 'viewContact', 'viewUserDashboard', 'viewAdminDashboard'];
+      views.forEach(v => {
+        const el = document.getElementById(v);
+        if (el) el.classList.add('hidden');
+      });
+
+      const hero = document.getElementById('heroSection');
+      if (viewName === 'viewCatalog') {
+        hero.classList.remove('hidden');
+      } else {
+        hero.classList.add('hidden');
+      }
+
+      const activeEl = document.getElementById(viewName);
+      if (activeEl) activeEl.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Update Header Auth Display
+    function renderHeaderAuth() {
+      const authButtons = document.getElementById('authButtons');
+      const userBadge = document.getElementById('userBadge');
+      const roleBadgeSpan = document.getElementById('roleBadgeSpan');
+      const userNameSpan = document.getElementById('userNameSpan');
+
+      if (appState.currentUser) {
+        authButtons.classList.add('hidden');
+        userBadge.classList.remove('hidden');
+        userBadge.classList.add('flex');
+        userNameSpan.textContent = appState.currentUser.name;
+
+        if (appState.currentUser.role === 'admin') {
+          roleBadgeSpan.textContent = 'Librarian Admin';
+          roleBadgeSpan.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 border border-purple-200';
+        } else {
+          roleBadgeSpan.textContent = 'Student';
+          roleBadgeSpan.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 border border-blue-200';
+        }
+      } else {
+        authButtons.classList.remove('hidden');
+        userBadge.classList.add('hidden');
+        userBadge.classList.remove('flex');
+      }
+    }
+
+    // Render Catalog
+    function renderCatalog() {
+      const grid = document.getElementById('catalogGrid');
+      const countBadge = document.getElementById('catalogCountBadge');
+      const query = (document.getElementById('catalogSearchInput').value || '').toLowerCase().trim();
+      const cat = document.getElementById('catalogCategoryFilter').value;
+      const avail = document.getElementById('catalogAvailabilityFilter').value;
+
+      const filtered = appState.books.filter(b => {
+        const matchQuery = !query || b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query) || b.isbn.toLowerCase().includes(query) || b.category.toLowerCase().includes(query);
+        const matchCat = cat === 'ALL' || b.category === cat;
+        const matchAvail = avail === 'ALL' || (avail === 'AVAILABLE' && b.available > 0) || (avail === 'ISSUED' && b.available === 0);
+        return matchQuery && matchCat && matchAvail;
+      });
+
+      countBadge.textContent = `${filtered.length} items`;
+      grid.innerHTML = '';
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center bg-white rounded-2xl border border-dashed border-slate-300">
+            <span class="text-4xl block mb-2">🔍</span>
+            <p class="text-slate-600 font-semibold">No matching books found</p>
+            <p class="text-xs text-slate-400 mt-1">Try tweaking your search keywords or clear filters</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(book => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between cursor-pointer group';
+        const isAvail = book.available > 0;
+        card.innerHTML = `
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-3">
+              <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">${book.category}</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${isAvail ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+                ${isAvail ? `${book.available} in stock` : 'Out of Stock'}
+              </span>
+            </div>
+            <h3 class="font-bold text-slate-900 group-hover:text-blue-600 transition text-sm leading-snug line-clamp-2 mb-1">${book.title}</h3>
+            <p class="text-xs text-slate-500 mb-3">${book.author}</p>
+            <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-4">${book.description}</p>
+          </div>
+          <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-xs text-slate-500">
+            <span>📍 ${book.rack}</span>
+            <span class="font-semibold text-blue-600 group-hover:underline">View Details →</span>
+          </div>
+        `;
+        card.addEventListener('click', () => openBookDetails(book.id));
+        grid.appendChild(card);
+      });
+    }
+
+    // Open Book Details Modal
+    let selectedBookForBorrow = null;
+    function openBookDetails(bookId) {
+      const book = appState.books.find(b => b.id === bookId);
+      if (!book) return;
+      selectedBookForBorrow = book;
+
+      document.getElementById('modalBookCategory').textContent = book.category;
+      document.getElementById('modalBookTitle').textContent = book.title;
+      document.getElementById('modalBookAuthor').textContent = `By ${book.author}`;
+      document.getElementById('modalBookISBN').textContent = book.isbn;
+      document.getElementById('modalBookRack').textContent = book.rack;
+      document.getElementById('modalBookTotal').textContent = `${book.quantity} copies`;
+      document.getElementById('modalBookAvail').textContent = `${book.available} copies available`;
+      document.getElementById('modalBookDesc').textContent = book.description;
+
+      const borrowBtn = document.getElementById('modalBorrowActionBtn');
+      if (book.available <= 0) {
+        borrowBtn.textContent = 'Currently Unavailable';
+        borrowBtn.disabled = true;
+        borrowBtn.className = 'px-5 py-2 bg-slate-300 text-slate-500 font-semibold text-xs rounded-xl cursor-not-allowed';
+      } else {
+        borrowBtn.textContent = 'Borrow This Book';
+        borrowBtn.disabled = false;
+        borrowBtn.className = 'px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow transition';
+      }
+
+      document.getElementById('bookDetailsModal').classList.remove('hidden');
+    }
+
+    // Borrow Action from Modal
+    document.getElementById('modalBorrowActionBtn').addEventListener('click', () => {
+      if (!appState.currentUser) {
+        document.getElementById('bookDetailsModal').classList.add('hidden');
+        document.getElementById('loginModal').classList.remove('hidden');
+        showToast('Please log in with your student credentials to borrow books', 'warning');
+        return;
+      }
+      if (appState.currentUser.role === 'admin') {
+        showToast('Librarians should issue books via the Admin Desk tab', 'info');
+        return;
+      }
+
+      // Check if student already has this book issued
+      const alreadyHas = appState.issues.find(i => i.studentEmail === appState.currentUser.email && i.bookId === selectedBookForBorrow.id && i.status === 'ISSUED');
+      if (alreadyHas) {
+        showToast('You already have an active loan for this book!', 'warning');
+        return;
+      }
+
+      // Perform Issue
+      selectedBookForBorrow.available -= 1;
+      const today = new Date().toISOString().split('T')[0];
+      const dueDateObj = new Date();
+      dueDateObj.setDate(dueDateObj.getDate() + 14);
+      const dueDate = dueDateObj.toISOString().split('T')[0];
+
+      appState.issues.unshift({
+        id: 'ISS' + Date.now().toString().slice(-4),
+        studentEmail: appState.currentUser.email,
+        studentName: appState.currentUser.name,
+        bookId: selectedBookForBorrow.id,
+        bookTitle: selectedBookForBorrow.title,
+        issueDate: today,
+        dueDate: dueDate,
+        status: 'ISSUED',
+        returnDate: null,
+        fineAmount: 0,
+        fineStatus: 'PAID'
+      });
+
+      saveState();
+      renderCatalog();
+      document.getElementById('bookDetailsModal').classList.add('hidden');
+      showToast(`Success! "${selectedBookForBorrow.title}" has been issued to your account. Return by ${dueDate}.`, 'success');
+    });
+
+    // Render Study Materials
+    function renderMaterials() {
+      const yearFilter = document.getElementById('matYearFilter').value;
+      const semFilter = document.getElementById('matSemFilter').value;
+      const tbody = document.getElementById('materialsTableBody');
+      tbody.innerHTML = '';
+
+      const filtered = appState.materials.filter(m => {
+        const matchYear = yearFilter === 'ALL' || m.year === yearFilter;
+        const matchSem = semFilter === 'ALL' || m.sem === semFilter;
+        return matchYear && matchSem;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">No study materials found for the selected Year & Semester.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(mat => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML = `
+          <td class="px-4 py-3">
+            <div class="font-semibold text-slate-900">${mat.title}</div>
+            <div class="text-xs text-slate-500">${mat.subject}</div>
+          </td>
+          <td class="px-4 py-3 font-medium">Year ${mat.year} • Sem ${mat.sem}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 text-xs bg-slate-100 rounded-full font-medium text-slate-700">${mat.type}</span></td>
+          <td class="px-4 py-3 text-xs text-slate-500">${mat.format}</td>
+          <td class="px-4 py-3 text-right">
+            <button class="download-mat-btn px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-semibold transition" data-title="${mat.title}">Download 📥</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tbody.querySelectorAll('.download-mat-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const title = e.currentTarget.getAttribute('data-title');
+          showToast(`Downloading file: ${title}`, 'success');
+        });
+      });
+    }
+
+    // Render Student User Dashboard
+    function renderUserDashboard() {
+      if (!appState.currentUser || appState.currentUser.role !== 'user') return;
+      document.getElementById('userDashName').textContent = appState.currentUser.name;
+      document.getElementById('userDashMeta').textContent = `${appState.currentUser.dept || 'Engineering'} • Year ${appState.currentUser.year || '3'}, Sem ${appState.currentUser.sem || '6'}`;
+
+      // Form fill
+      document.getElementById('profName').value = appState.currentUser.name;
+      document.getElementById('profEmail').value = appState.currentUser.email;
+      document.getElementById('profYear').value = appState.currentUser.year || '3';
+      document.getElementById('profSem').value = appState.currentUser.sem || '6';
+      document.getElementById('profDept').value = appState.currentUser.dept || 'Computer Science & Engineering';
+
+      // History Table
+      const myIssues = appState.issues.filter(i => i.studentEmail === appState.currentUser.email);
+      const tbody = document.getElementById('userHistoryTableBody');
+      tbody.innerHTML = '';
+
+      let totalFine = 0;
+
+      if (myIssues.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">No borrowing history on record. Explore the catalog to borrow books.</td></tr>`;
+      } else {
+        myIssues.forEach(item => {
+          if (item.fineStatus === 'UNPAID' && item.fineAmount > 0) {
+            totalFine += item.fineAmount;
+          }
+          const tr = document.createElement('tr');
+          const isReturned = item.status === 'RETURNED';
+          tr.className = 'hover:bg-slate-50 transition';
+          tr.innerHTML = `
+            <td class="px-4 py-3 font-medium text-slate-900">${item.bookTitle}</td>
+            <td class="px-4 py-3 text-xs text-slate-500">${item.issueDate}</td>
+            <td class="px-4 py-3 text-xs font-semibold ${!isReturned ? 'text-amber-700' : 'text-slate-500'}">${item.dueDate}</td>
+            <td class="px-4 py-3">
+              <span class="px-2.5 py-0.5 text-xs rounded-full font-semibold ${isReturned ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}">
+                ${isReturned ? 'Returned' : 'Active Loan'}
+              </span>
+            </td>
+            <td class="px-4 py-3 font-semibold ${item.fineAmount > 0 && item.fineStatus === 'UNPAID' ? 'text-rose-600' : 'text-slate-500'}">
+              ₹${item.fineAmount}.00 <span class="text-[10px] font-normal uppercase text-slate-400">(${item.fineStatus})</span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById('userTotalFineText').textContent = `₹${totalFine}.00`;
+      const payBtn = document.getElementById('payFineBtn');
+      if (totalFine > 0) {
+        payBtn.classList.remove('hidden');
+      } else {
+        payBtn.classList.add('hidden');
+      }
+    }
+
+    // Pay Fine Handler
+    document.getElementById('payFineBtn').addEventListener('click', () => {
+      if (!appState.currentUser) return;
+      appState.issues.forEach(i => {
+        if (i.studentEmail === appState.currentUser.email && i.fineStatus === 'UNPAID') {
+          i.fineStatus = 'PAID';
+        }
+      });
+      saveState();
+      renderUserDashboard();
+      showToast('All pending library fines have been successfully paid!', 'success');
+    });
+
+    // Render Admin Dashboard
+    function renderAdminDashboard() {
+      if (!appState.currentUser || appState.currentUser.role !== 'admin') return;
+
+      // Metrics
+      document.getElementById('metricTotalBooks').textContent = appState.books.reduce((acc, b) => acc + Number(b.quantity), 0);
+      document.getElementById('metricIssuedBooks').textContent = appState.issues.filter(i => i.status === 'ISSUED').length;
+      document.getElementById('metricOverdueLoans').textContent = appState.issues.filter(i => i.status === 'ISSUED' && i.fineAmount > 0).length;
+
+      const totalUnpaidFines = appState.issues.filter(i => i.fineStatus === 'UNPAID').reduce((acc, i) => acc + (i.fineAmount || 0), 0);
+      document.getElementById('metricTotalFines').textContent = `₹${totalUnpaidFines}`;
+      document.getElementById('adminFineRateInput').value = appState.fineRatePerDay;
+
+      // Tab 1: Inventory Table
+      const invBody = document.getElementById('adminInventoryTableBody');
+      invBody.innerHTML = '';
+      appState.books.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML = `
+          <td class="px-4 py-3">
+            <div class="font-semibold text-slate-900">${b.title}</div>
+            <div class="text-xs text-slate-400">${b.author}</div>
+          </td>
+          <td class="px-4 py-3 text-xs text-slate-500 font-mono">${b.isbn}</td>
+          <td class="px-4 py-3 text-xs text-slate-600">${b.category}</td>
+          <td class="px-4 py-3 font-semibold text-xs">${b.available} / ${b.quantity}</td>
+          <td class="px-4 py-3 text-xs text-slate-500">${b.rack}</td>
+          <td class="px-4 py-3 text-right space-x-1">
+            <button class="edit-book-btn px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold" data-id="${b.id}">Edit</button>
+            <button class="del-book-btn px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-xs font-semibold" data-id="${b.id}">Delete</button>
+          </td>
+        `;
+        invBody.appendChild(tr);
+      });
+
+      invBody.querySelectorAll('.edit-book-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.getAttribute('data-id');
+          openEditBookModal(id);
+        });
+      });
+
+      invBody.querySelectorAll('.del-book-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.getAttribute('data-id');
+          deleteBook(id);
+        });
+      });
+
+      // Tab 2: Issue Selects & Active Issues Table
+      const studentSelect = document.getElementById('issueStudentSelect');
+      studentSelect.innerHTML = '<option value="">-- Choose Student --</option>';
+      appState.users.forEach(u => {
+        studentSelect.innerHTML += `<option value="${u.email}">${u.name} (${u.email})</option>`;
+      });
+
+      const bookSelect = document.getElementById('issueBookSelect');
+      bookSelect.innerHTML = '<option value="">-- Choose Available Book --</option>';
+      appState.books.filter(b => b.available > 0).forEach(b => {
+        bookSelect.innerHTML += `<option value="${b.id}">${b.title} [Avail: ${b.available}]</option>`;
+      });
+
+      const issuedBody = document.getElementById('adminIssuedTableBody');
+      issuedBody.innerHTML = '';
+      appState.issues.forEach(iss => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        const isRet = iss.status === 'RETURNED';
+        tr.innerHTML = `
+          <td class="px-4 py-3">
+            <div class="font-semibold text-slate-900">${iss.studentName}</div>
+            <div class="text-xs text-slate-400">${iss.studentEmail}</div>
+          </td>
+          <td class="px-4 py-3 text-xs font-medium text-slate-800">${iss.bookTitle}</td>
+          <td class="px-4 py-3 text-xs text-slate-500">${iss.issueDate}</td>
+          <td class="px-4 py-3 text-xs font-semibold ${!isRet ? 'text-amber-700' : 'text-slate-500'}">${iss.dueDate}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${isRet ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}">
+              ${iss.status}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-xs font-semibold ${iss.fineAmount > 0 ? 'text-rose-600' : 'text-slate-600'}">
+            ₹${iss.fineAmount}.00 (${iss.fineStatus})
+          </td>
+          <td class="px-4 py-3 text-right">
+            ${!isRet ? `<button class="return-book-btn px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition" data-id="${iss.id}">Mark Returned</button>` : `<span class="text-xs text-slate-400">Completed</span>`}
+          </td>
+        `;
+        issuedBody.appendChild(tr);
+      });
+
+      issuedBody.querySelectorAll('.return-book-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const issId = e.currentTarget.getAttribute('data-id');
+          markBookReturned(issId);
+        });
+      });
+
+      // Tab 3: Fine Management Table
+      const fineBody = document.getElementById('adminFineTableBody');
+      fineBody.innerHTML = '';
+      const overdueIssues = appState.issues.filter(i => i.fineAmount > 0);
+      if (overdueIssues.length === 0) {
+        fineBody.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">No overdue fines on record.</td></tr>`;
+      } else {
+        overdueIssues.forEach(iss => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition';
+          tr.innerHTML = `
+            <td class="px-4 py-3">
+              <div class="font-semibold text-slate-900">${iss.studentName}</div>
+              <div class="text-xs text-slate-400">${iss.studentEmail}</div>
+            </td>
+            <td class="px-4 py-3 text-xs font-medium text-slate-700">${iss.bookTitle}</td>
+            <td class="px-4 py-3 text-xs font-semibold text-rose-600">${Math.round(iss.fineAmount / appState.fineRatePerDay)} days</td>
+            <td class="px-4 py-3 text-sm font-bold text-rose-600">₹${iss.fineAmount}.00</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded-full text-xs font-bold ${iss.fineStatus === 'PAID' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">
+                ${iss.fineStatus}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-right">
+              ${iss.fineStatus === 'UNPAID' ? `<button class="collect-fine-btn px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition" data-id="${iss.id}">Mark Collected</button>` : `<span class="text-xs text-emerald-600 font-semibold">Settled</span>`}
+            </td>
+          `;
+          fineBody.appendChild(tr);
+        });
+
+        fineBody.querySelectorAll('.collect-fine-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const issId = e.currentTarget.getAttribute('data-id');
+            const target = appState.issues.find(i => i.id === issId);
+            if (target) {
+              target.fineStatus = 'PAID';
+              saveState();
+              renderAdminDashboard();
+              showToast(`Fine of ₹${target.fineAmount} marked collected for ${target.studentName}`, 'success');
+            }
+          });
+        });
+      }
+
+      // Tab 4: Admin Materials List
+      const matBody = document.getElementById('adminMaterialsTableBody');
+      matBody.innerHTML = '';
+      appState.materials.forEach(m => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML = `
+          <td class="px-4 py-3">
+            <div class="font-semibold text-slate-900">${m.title}</div>
+            <div class="text-xs text-slate-400">${m.subject}</div>
+          </td>
+          <td class="px-4 py-3 text-xs font-medium">Year ${m.year} • Sem ${m.sem}</td>
+          <td class="px-4 py-3 text-xs">${m.type}</td>
+          <td class="px-4 py-3 text-xs text-slate-500">${m.format}</td>
+          <td class="px-4 py-3 text-right">
+            <button class="del-mat-btn px-2.5 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded text-xs font-semibold transition" data-id="${m.id}">Delete</button>
+          </td>
+        `;
+        matBody.appendChild(tr);
+      });
+
+      matBody.querySelectorAll('.del-mat-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.getAttribute('data-id');
+          appState.materials = appState.materials.filter(m => m.id !== id);
+          saveState();
+          renderAdminDashboard();
+          renderMaterials();
+          showToast('Study material item deleted', 'info');
+        });
+      });
+    }
+
+    // Return Book Action
+    function markBookReturned(issId) {
+      const issue = appState.issues.find(i => i.id === issId);
+      if (!issue) return;
+      issue.status = 'RETURNED';
+      issue.returnDate = new Date().toISOString().split('T')[0];
+
+      // Restore book inventory
+      const book = appState.books.find(b => b.id === issue.bookId);
+      if (book) {
+        book.available = Math.min(book.quantity, book.available + 1);
+      }
+
+      saveState();
+      renderAdminDashboard();
+      renderCatalog();
+      showToast(`Book "${issue.bookTitle}" marked returned. Inventory updated.`, 'success');
+    }
+
+    // Delete Book
+    function deleteBook(bookId) {
+      const activeLoans = appState.issues.filter(i => i.bookId === bookId && i.status === 'ISSUED');
+      if (activeLoans.length > 0) {
+        showToast('Cannot delete book with active issued copies!', 'error');
+        return;
+      }
+      appState.books = appState.books.filter(b => b.id !== bookId);
+      saveState();
+      renderAdminDashboard();
+      renderCatalog();
+      showToast('Book removed from catalog', 'info');
+    }
+
+    // Open Edit Book Modal
+    function openEditBookModal(bookId) {
+      const book = appState.books.find(b => b.id === bookId);
+      if (!book) return;
+      document.getElementById('editBookId').value = book.id;
+      document.getElementById('adminBookTitle').value = book.title;
+      document.getElementById('adminBookAuthor').value = book.author;
+      document.getElementById('adminBookISBN').value = book.isbn;
+      document.getElementById('adminBookCategory').value = book.category;
+      document.getElementById('adminBookQty').value = book.quantity;
+      document.getElementById('adminBookRack').value = book.rack;
+      document.getElementById('adminBookDesc').value = book.description;
+      document.getElementById('bookAdminModalTitle').textContent = 'Update Book Information';
+      document.getElementById('bookAdminModal').classList.remove('hidden');
+    }
+
+    // Setup Event Listeners
+    function setupEventListeners() {
+      // Nav Brand & Links
+      document.getElementById('navBrandBtn').addEventListener('click', () => switchView('viewCatalog'));
+      document.getElementById('navCatalogBtn').addEventListener('click', () => switchView('viewCatalog'));
+      document.getElementById('heroBrowseBtn').addEventListener('click', () => switchView('viewCatalog'));
+      document.getElementById('navMaterialsBtn').addEventListener('click', () => {
+        switchView('viewMaterials');
+        renderMaterials();
+      });
+      document.getElementById('heroMaterialsBtn').addEventListener('click', () => {
+        switchView('viewMaterials');
+        renderMaterials();
+      });
+      document.getElementById('navContactBtn').addEventListener('click', () => switchView('viewContact'));
+
+      // Dashboard Button
+      document.getElementById('myDashboardBtn').addEventListener('click', () => {
+        if (!appState.currentUser) return;
+        if (appState.currentUser.role === 'admin') {
+          switchView('viewAdminDashboard');
+          renderAdminDashboard();
+        } else {
+          switchView('viewUserDashboard');
+          renderUserDashboard();
+        }
+      });
+
+      // Search & Filters
+      document.getElementById('catalogSearchInput').addEventListener('input', renderCatalog);
+      document.getElementById('catalogCategoryFilter').addEventListener('change', renderCatalog);
+      document.getElementById('catalogAvailabilityFilter').addEventListener('change', renderCatalog);
+
+      document.getElementById('matYearFilter').addEventListener('change', renderMaterials);
+      document.getElementById('matSemFilter').addEventListener('change', renderMaterials);
+
+      // Contact Form
+      document.getElementById('contactForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        showToast('Thank you! Your message has been sent to the library desk.', 'success');
+        e.target.reset();
+      });
+
+      // User Profile Form
+      document.getElementById('userProfileForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!appState.currentUser) return;
+        appState.currentUser.name = document.getElementById('profName').value;
+        appState.currentUser.year = document.getElementById('profYear').value;
+        appState.currentUser.sem = document.getElementById('profSem').value;
+        appState.currentUser.dept = document.getElementById('profDept').value;
+        saveState();
+        renderHeaderAuth();
+        renderUserDashboard();
+        showToast('Profile information successfully saved!', 'success');
+      });
+
+      // User Dashboard Tabs
+      document.getElementById('tabUserHistory').addEventListener('click', () => {
+        document.getElementById('tabUserHistory').className = 'py-3 text-sm font-semibold tab-active transition';
+        document.getElementById('tabUserProfile').className = 'py-3 text-sm font-semibold text-slate-500 hover:text-blue-600 transition';
+        document.getElementById('userHistoryPanel').classList.remove('hidden');
+        document.getElementById('userProfilePanel').classList.add('hidden');
+      });
+      document.getElementById('tabUserProfile').addEventListener('click', () => {
+        document.getElementById('tabUserProfile').className = 'py-3 text-sm font-semibold tab-active transition';
+        document.getElementById('tabUserHistory').className = 'py-3 text-sm font-semibold text-slate-500 hover:text-blue-600 transition';
+        document.getElementById('userProfilePanel').classList.remove('hidden');
+        document.getElementById('userHistoryPanel').classList.add('hidden');
+      });
+
+      // Admin Dashboard Tabs
+      const adminTabs = [
+        { btn: 'adminTabInventory', panel: 'adminPanelInventory' },
+        { btn: 'adminTabIssueReturn', panel: 'adminPanelIssueReturn' },
+        { btn: 'adminTabFines', panel: 'adminPanelFines' },
+        { btn: 'adminTabMaterials', panel: 'adminPanelMaterials' }
+      ];
+      adminTabs.forEach(t => {
+        document.getElementById(t.btn).addEventListener('click', () => {
+          adminTabs.forEach(ot => {
+            document.getElementById(ot.btn).className = 'py-3 text-sm font-semibold text-slate-500 hover:text-blue-600 transition';
+            document.getElementById(ot.panel).classList.add('hidden');
+          });
+          document.getElementById(t.btn).className = 'py-3 text-sm font-semibold tab-active transition';
+          document.getElementById(t.panel).classList.remove('hidden');
+        });
+      });
+
+      // Issue Book Submit (Admin)
+      document.getElementById('issueBookForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const studentEmail = document.getElementById('issueStudentSelect').value;
+        const bookId = document.getElementById('issueBookSelect').value;
+        const days = parseInt(document.getElementById('issueDurationDays').value, 10) || 14;
+
+        if (!studentEmail || !bookId) {
+          showToast('Please select both a student and an available book', 'error');
+          return;
+        }
+
+        const student = appState.users.find(u => u.email === studentEmail);
+        const book = appState.books.find(b => b.id === bookId);
+
+        if (!book || book.available <= 0) {
+          showToast('Selected book has no available stock', 'error');
+          return;
+        }
+
+        book.available -= 1;
+        const today = new Date().toISOString().split('T')[0];
+        const dueDateObj = new Date();
+        dueDateObj.setDate(dueDateObj.getDate() + days);
+        const dueDate = dueDateObj.toISOString().split('T')[0];
+
+        appState.issues.unshift({
+          id: 'ISS' + Date.now().toString().slice(-4),
+          studentEmail: student.email,
+          studentName: student.name,
+          bookId: book.id,
+          bookTitle: book.title,
+          issueDate: today,
+          dueDate: dueDate,
+          status: 'ISSUED',
+          returnDate: null,
+          fineAmount: 0,
+          fineStatus: 'PAID'
+        });
+
+        saveState();
+        renderAdminDashboard();
+        renderCatalog();
+        showToast(`Book issued to ${student.name}. Due on ${dueDate}`, 'success');
+        e.target.reset();
+      });
+
+      // Update Fine Rate Button
+      document.getElementById('saveFineRateBtn').addEventListener('click', () => {
+        const rate = parseFloat(document.getElementById('adminFineRateInput').value) || 5;
+        appState.fineRatePerDay = rate;
+        saveState();
+        showToast(`Fine rate updated to ₹${rate} per overdue day`, 'success');
+      });
+
+      // Add Material Form Submit (Admin)
+      document.getElementById('addMaterialForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newMat = {
+          id: 'M' + Date.now().toString().slice(-4),
+          subject: document.getElementById('matSubject').value,
+          title: document.getElementById('matTitle').value,
+          type: document.getElementById('matTypeSelect').value,
+          year: document.getElementById('matYearSelect').value,
+          sem: document.getElementById('matSemSelect').value,
+          format: document.getElementById('matSize').value
+        };
+        appState.materials.unshift(newMat);
+        saveState();
+        renderAdminDashboard();
+        renderMaterials();
+        showToast(`Uploaded material for Year ${newMat.year}, Sem ${newMat.sem}`, 'success');
+        e.target.reset();
+      });
+
+      // Modals Open/Close
+      document.getElementById('openLoginModalBtn').addEventListener('click', () => {
+        document.getElementById('loginModal').classList.remove('hidden');
+      });
+      document.getElementById('closeLoginModalBtn').addEventListener('click', () => {
+        document.getElementById('loginModal').classList.add('hidden');
+      });
+      document.getElementById('openRegisterModalBtn').addEventListener('click', () => {
+        document.getElementById('registerModal').classList.remove('hidden');
+      });
+      document.getElementById('closeRegisterModalBtn').addEventListener('click', () => {
+        document.getElementById('registerModal').classList.add('hidden');
+      });
+      document.getElementById('closeBookDetailsBtn').addEventListener('click', () => {
+        document.getElementById('bookDetailsModal').classList.add('hidden');
+      });
+
+      // Book Admin Modal (Add/Edit)
+      document.getElementById('openAddBookModalBtn').addEventListener('click', () => {
+        document.getElementById('editBookId').value = '';
+        document.getElementById('bookAdminForm').reset();
+        document.getElementById('bookAdminModalTitle').textContent = 'Add New Book to Inventory';
+        document.getElementById('bookAdminModal').classList.remove('hidden');
+      });
+      document.getElementById('closeBookAdminModalBtn').addEventListener('click', () => {
+        document.getElementById('bookAdminModal').classList.add('hidden');
+      });
+
+      // Book Admin Form Submit
+      document.getElementById('bookAdminForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const editId = document.getElementById('editBookId').value;
+        const qty = parseInt(document.getElementById('adminBookQty').value, 10);
+
+        if (editId) {
+          const book = appState.books.find(b => b.id === editId);
+          if (book) {
+            const diff = qty - book.quantity;
+            book.title = document.getElementById('adminBookTitle').value;
+            book.author = document.getElementById('adminBookAuthor').value;
+            book.isbn = document.getElementById('adminBookISBN').value;
+            book.category = document.getElementById('adminBookCategory').value;
+            book.quantity = qty;
+            book.available = Math.max(0, book.available + diff);
+            book.rack = document.getElementById('adminBookRack').value;
+            book.description = document.getElementById('adminBookDesc').value;
+            showToast('Book details successfully updated', 'success');
+          }
+        } else {
+          const newBook = {
+            id: 'B' + Date.now().toString().slice(-4),
+            title: document.getElementById('adminBookTitle').value,
+            author: document.getElementById('adminBookAuthor').value,
+            isbn: document.getElementById('adminBookISBN').value,
+            category: document.getElementById('adminBookCategory').value,
+            quantity: qty,
+            available: qty,
+            rack: document.getElementById('adminBookRack').value,
+            description: document.getElementById('adminBookDesc').value
+          };
+          appState.books.unshift(newBook);
+          showToast('New book added to library inventory', 'success');
+        }
+
+        saveState();
+        renderAdminDashboard();
+        renderCatalog();
+        document.getElementById('bookAdminModal').classList.add('hidden');
+      });
+
+      // Role Selector in Login Modal
+      let selectedLoginRole = 'user';
+      document.getElementById('loginRoleUserBtn').addEventListener('click', () => {
+        selectedLoginRole = 'user';
+        document.getElementById('loginRoleUserBtn').className = 'py-2 rounded-lg bg-white shadow-sm text-blue-600 transition';
+        document.getElementById('loginRoleAdminBtn').className = 'py-2 rounded-lg text-slate-600 transition';
+        document.getElementById('adminCredentialHint').classList.add('hidden');
+      });
+      document.getElementById('loginRoleAdminBtn').addEventListener('click', () => {
+        selectedLoginRole = 'admin';
+        document.getElementById('loginRoleAdminBtn').className = 'py-2 rounded-lg bg-white shadow-sm text-purple-600 transition';
+        document.getElementById('loginRoleUserBtn').className = 'py-2 rounded-lg text-slate-600 transition';
+        document.getElementById('adminCredentialHint').classList.remove('hidden');
+        document.getElementById('loginEmail').value = 'admin';
+        document.getElementById('loginPassword').value = 'admin123';
+      });
+
+      // Quick Admin Demo Login
+      document.getElementById('quickLoginAdminBtn').addEventListener('click', () => {
+        appState.currentUser = {
+          role: 'admin',
+          name: 'Chief Librarian',
+          email: 'admin@library.college.edu',
+          dept: 'Central Library'
+        };
+        saveState();
+        renderHeaderAuth();
+        switchView('viewAdminDashboard');
+        renderAdminDashboard();
+        showToast('Logged in as Librarian Admin (Full Dashboard Access)', 'success');
+      });
+
+      // Login Form Submit
+      document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const pwd = document.getElementById('loginPassword').value;
+
+        if (selectedLoginRole === 'admin') {
+          if (email === 'admin' && pwd === 'admin123') {
+            appState.currentUser = {
+              role: 'admin',
+              name: 'Chief Librarian',
+              email: 'admin@library.college.edu',
+              dept: 'Central Library'
+            };
+            saveState();
+            document.getElementById('loginModal').classList.add('hidden');
+            renderHeaderAuth();
+            switchView('viewAdminDashboard');
+            renderAdminDashboard();
+            showToast('Welcome, Librarian Admin!', 'success');
+          } else {
+            showToast('Invalid admin credentials. Use admin / admin123', 'error');
+          }
+        } else {
+          const user = appState.users.find(u => (u.email === email || u.name.toLowerCase() === email.toLowerCase()) && u.password === pwd);
+          if (user) {
+            appState.currentUser = { ...user, role: 'user' };
+            saveState();
+            document.getElementById('loginModal').classList.add('hidden');
+            renderHeaderAuth();
+            switchView('viewUserDashboard');
+            renderUserDashboard();
+            showToast(`Welcome back, ${user.name}!`, 'success');
+          } else {
+            showToast('Invalid student credentials. You can register a new account.', 'error');
+          }
+        }
+      });
+
+      // Register Form Submit
+      document.getElementById('registerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('regEmail').value.trim();
+        if (appState.users.find(u => u.email === email)) {
+          showToast('An account with this email already exists', 'error');
+          return;
+        }
+
+        const newUser = {
+          name: document.getElementById('regName').value.trim(),
+          email: email,
+          password: document.getElementById('regPassword').value,
+          year: document.getElementById('regYear').value,
+          sem: document.getElementById('regSem').value,
+          dept: document.getElementById('regDept').value,
+          role: 'user'
+        };
+
+        appState.users.push(newUser);
+        appState.currentUser = newUser;
+        saveState();
+        document.getElementById('registerModal').classList.add('hidden');
+        renderHeaderAuth();
+        switchView('viewUserDashboard');
+        renderUserDashboard();
+        showToast('Account registered successfully! Welcome to LibCentral.', 'success');
+      });
+
+      // Logout Button
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        appState.currentUser = null;
+        saveState();
+        renderHeaderAuth();
+        switchView('viewCatalog');
+        showToast('You have been logged out safely', 'info');
+      });
+    }
+
+    // Initialize App
+    window.addEventListener('DOMContentLoaded', () => {
+      setupEventListeners();
+      renderHeaderAuth();
+      renderCatalog();
+    });
+  </script>
+</body>
+</html>
