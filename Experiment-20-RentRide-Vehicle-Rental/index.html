@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentRide - Modern Vehicle Rental System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🚗</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">RentRide Fleet</span>
+          <span class="ml-2 text-xs bg-blue-100 text-blue-800 font-semibold px-2 py-0.5 rounded-full border border-blue-200">Exp 20: Vehicle Rental</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleRentRole('user')" id="btnU" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white">Customer</button>
+        <button onclick="toggleRentRole('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Fleet Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- USER VIEW -->
+  <main id="userRentView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-blue-700 via-indigo-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-1">Drive Premium Sedans, SUVs & Commercial Trucks</h2>
+      <p class="text-blue-100 text-xs mb-4">Flexible rental durations, verified vehicle inspections, and fast digital check-in.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white text-slate-800 p-4 rounded-xl">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Vehicle Category</label>
+          <select id="rentCat" onchange="filterFleet()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Categories</option>
+            <option value="Sedan">Sedans</option>
+            <option value="SUV">SUVs</option>
+            <option value="Truck">Trucks / Haulers</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Pickup Location</label>
+          <select class="w-full border p-2 rounded-lg text-sm">
+            <option>Chennai Airport Terminal</option>
+            <option>Bangalore Central Hub</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Rental Duration</label>
+          <select class="w-full border p-2 rounded-lg text-sm">
+            <option>1 Day (24 hrs)</option>
+            <option>3 Days Weekend</option>
+            <option>7 Days Weekly</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="filterFleet()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-sm">Search Fleet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fleet Grid -->
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Available Fleet Vehicles</h3>
+      <div id="fleetGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <!-- My Bookings -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">My Reservations & Digital Check-In Status</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Booking ID</th>
+              <th class="p-3">Vehicle</th>
+              <th class="p-3">Customer Phone</th>
+              <th class="p-3">Duration</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userRentTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminRentView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">Fleet Operations & Booking Approval</h3>
+        <p class="text-xs text-amber-700">Add fleet vehicles, set day rates, and approve customer booking reservations.</p>
+      </div>
+      <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Fleet Admin Auth</span>
+    </div>
+
+    <!-- Add Vehicle Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Add Vehicle to Fleet</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Vehicle Model</label>
+          <input id="newVehModel" value="Toyota Fortuner 4x4" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+          <select id="newVehCat" class="w-full border p-2 rounded-lg text-xs">
+            <option>SUV</option>
+            <option>Sedan</option>
+            <option>Truck</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Daily Rate ($)</label>
+          <input id="newVehPrice" type="number" value="95" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="flex items-end">
+          <button onclick="adminAddVehicle()" class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-xs">Register Vehicle</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Booking Approvals -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Customer Rental Requests & Verification</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">ID</th>
+              <th class="p-3">Applicant</th>
+              <th class="p-3">Vehicle</th>
+              <th class="p-3">Current Status</th>
+              <th class="p-3 text-right">Approval Decision</th>
+            </tr>
+          </thead>
+          <tbody id="adminRentTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Fleet Dispatch Monitor</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX20</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[RENTRIDE] Modern Fleet Management Initialized. 4 Categories online.</div>
+        <div>[CHECK-IN] Digital vehicle inspection & customer verification protocol enabled.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let fleet = [
+      { id: 1, name: "Tesla Model 3 Electric", cat: "Sedan", price: 85, icon: "⚡", specs: "5 Seater, Autopilot, 320mi range" },
+      { id: 2, name: "Toyota Fortuner 4x4", cat: "SUV", price: 95, icon: "🚙", specs: "7 Seater, Diesel Turbo, All-Terrain" },
+      { id: 3, name: "Ford F-150 Heavy Duty", cat: "Truck", price: 110, icon: "🛻", specs: "EcoBoost V6, 3,300 lbs payload" },
+      { id: 4, name: "Honda City VTEC Sedan", cat: "Sedan", price: 45, icon: "🚗", specs: "5 Seater, Automatic, High Efficiency" }
+    ];
+
+    let rentals = [
+      { id: "RR-801", user: "Winston Y.", phone: "+91 98401 23456", veh: "Toyota Fortuner 4x4", dur: "3 Days", status: "Approved" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderFleet(list = fleet) {
+      const g = document.getElementById('fleetGrid');
+      g.innerHTML = '';
+      list.forEach(v => {
+        g.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="text-5xl mb-3 text-center">${v.icon}</div>
+              <span class="text-xs bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded">${v.cat}</span>
+              <h4 class="font-bold text-slate-900 text-sm mt-2">${v.name}</h4>
+              <p class="text-xs text-slate-500 mt-1">${v.specs}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t flex justify-between items-center">
+              <span class="text-base font-extrabold text-blue-900">$${v.price} <span class="text-xs font-normal text-slate-500">/ day</span></span>
+              <button onclick="bookVehicle('${v.name}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg transition">Book Now</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderRentals() {
+      const ut = document.getElementById('userRentTable');
+      const at = document.getElementById('adminRentTable');
+      ut.innerHTML = '';
+      at.innerHTML = '';
+
+      rentals.forEach(r => {
+        ut.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-blue-600">${r.id}</td>
+            <td class="p-3 font-semibold">${r.veh}</td>
+            <td class="p-3">${r.phone}</td>
+            <td class="p-3">${r.dur}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${r.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${r.status}</span></td>
+            <td class="p-3 text-right"><button onclick="alert('Digital key for ${r.id}')" class="text-xs bg-slate-100 px-2 py-1 rounded">Digital Key</button></td>
+          </tr>
+        `;
+
+        at.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold">${r.id}</td>
+            <td class="p-3 font-medium">${r.user}</td>
+            <td class="p-3">${r.veh}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">${r.status}</span></td>
+            <td class="p-3 text-right space-x-1">
+              <button onclick="adminApproveRental('${r.id}')" class="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded font-bold">Approve</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function bookVehicle(name) {
+      const phone = prompt(`Enter customer contact number for renting ${name}:`, "+91 98401 23456");
+      if (!phone) return;
+      const newId = "RR-" + Math.floor(100 + Math.random() * 900);
+      rentals.push({ id: newId, user: "Winston Y.", phone, veh: name, dur: "2 Days", status: "Pending Verification" });
+      renderRentals();
+      logOut(`[NEW RESERVATION] ${newId} created for ${name}. Fleet controller notified for verification.`);
+      alert(`Booking ${newId} placed! Pending admin verification.`);
+    }
+
+    function adminApproveRental(id) {
+      const r = rentals.find(x => x.id === id);
+      if (r) {
+        r.status = "Approved";
+        renderRentals();
+        logOut(`[ADMIN APPROVAL] Rental ${id} approved for vehicle: ${r.veh}. Digital key activated.`);
+        alert(`Rental ${id} approved!`);
+      }
+    }
+
+    function adminAddVehicle() {
+      const name = document.getElementById('newVehModel').value;
+      const cat = document.getElementById('newVehCat').value;
+      const price = parseFloat(document.getElementById('newVehPrice').value);
+
+      fleet.push({ id: fleet.length + 1, name, cat, price, icon: "🚙", specs: "Added by fleet admin." });
+      renderFleet();
+      logOut(`[FLEET ADD] ${name} (${cat}) added to available vehicles at $${price}/day.`);
+      alert(`${name} registered in fleet!`);
+    }
+
+    function filterFleet() {
+      const cat = document.getElementById('rentCat').value;
+      const f = fleet.filter(v => cat === 'All' || v.cat === cat);
+      renderFleet(f);
+    }
+
+    function toggleRentRole(r) {
+      if (r === 'admin') {
+        document.getElementById('userRentView').classList.add('hidden');
+        document.getElementById('adminRentView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white';
+        document.getElementById('btnU').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      } else {
+        document.getElementById('adminRentView').classList.add('hidden');
+        document.getElementById('userRentView').classList.remove('hidden');
+        document.getElementById('btnU').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white';
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      }
+    }
+
+    renderFleet();
+    renderRentals();
+  </script>
+</body>
+</html>

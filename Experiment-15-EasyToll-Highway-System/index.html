@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EasyToll - Online Highway Toll Payment System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🛣️</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">EasyToll Express</span>
+          <span class="ml-2 text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">Exp 15: Toll Payment</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTollRole('driver')" id="btnD" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white">Driver eWallet</button>
+        <button onclick="toggleTollRole('booth')" id="btnB" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Toll Gate Scanner</button>
+        <button onclick="toggleTollRole('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- DRIVER / USER VIEW -->
+  <main id="driverView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-emerald-700 via-teal-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h2 class="text-2xl font-bold mb-1">Pay Toll in Advance & Skip Booth Queues</h2>
+        <p class="text-emerald-100 text-xs max-w-xl">Pre-load your eWallet, purchase trip eTickets, or generate a monthly FASTag QR Code for instantaneous gate passage.</p>
+      </div>
+      <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 text-center min-w-[200px]">
+        <span class="text-xs text-emerald-200 block uppercase font-bold">eWallet Balance</span>
+        <span class="text-2xl font-black text-white" id="userWalletBal">Rs. 850</span>
+        <button onclick="addMoneyModal()" class="mt-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-1.5 rounded-lg shadow-sm">+ Add Money</button>
+      </div>
+    </div>
+
+    <!-- Pass Application & Quick Ticket -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+        <h4 class="font-bold text-slate-900">Buy Single / Return Toll eTicket</h4>
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="text-slate-500 block mb-1">Select Highway Toll Plaza</label>
+            <select id="tollPlazaSelect" class="w-full border p-2 rounded-lg">
+              <option value="Perungudi Plaza (OMR)">Perungudi Plaza (OMR) - Rs. 35</option>
+              <option value="Attibele Tollway (Bangalore)">Attibele Tollway (Bangalore) - Rs. 65</option>
+              <option value="Patanjali Plaza (NH48)">Patanjali Plaza (NH48) - Rs. 90</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-slate-500 block mb-1">Vehicle Registration Number</label>
+            <input id="vehReg" value="TN 09 BX 4412" class="w-full border p-2 rounded-lg uppercase font-mono font-bold">
+          </div>
+          <button onclick="buyTollTicket()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg">Purchase Toll eTicket from eWallet</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+        <h4 class="font-bold text-slate-900">Apply New / Renewal Toll Pass</h4>
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="text-slate-500 block mb-1">Pass Duration</label>
+            <select id="passDuration" class="w-full border p-2 rounded-lg">
+              <option value="Monthly (30 Days)">Monthly Pass (30 Days) - Rs. 650</option>
+              <option value="Quarterly (90 Days)">Quarterly Pass (90 Days) - Rs. 1,800</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-slate-500 block mb-1">Vehicle Category</label>
+            <select class="w-full border p-2 rounded-lg">
+              <option>Light Motor Vehicle (Car / Jeep)</option>
+              <option>Mini Bus / Light Commercial</option>
+              <option>Bus / 3-Axle Truck</option>
+            </select>
+          </div>
+          <button onclick="applyTollPass()" class="w-full bg-slate-800 text-white font-bold py-2 rounded-lg">Submit Pass Application</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Passes & Tickets with QR -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">My Active Toll Passes & Generated QR Codes</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Pass / Ticket #</th>
+              <th class="p-3">Plaza Route</th>
+              <th class="p-3">Vehicle #</th>
+              <th class="p-3">Validity</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Gate QR Code</th>
+            </tr>
+          </thead>
+          <tbody id="driverPassTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- TOLL BOOTH SCANNER VIEW -->
+  <main id="boothView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-blue-900">Toll Gate Operator Terminal</h3>
+        <p class="text-xs text-blue-700">Scan QR codes, verify toll pass IDs, validate single tickets, and update lane location.</p>
+      </div>
+      <span class="text-xs bg-blue-200 text-blue-900 font-bold px-3 py-1 rounded-full">Booth #4 - Perungudi Plaza</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+        <h4 class="font-bold text-slate-900">Scan Vehicle QR / Verify Pass ID</h4>
+        <div class="space-y-2 text-xs">
+          <input id="scanPassInput" placeholder="Enter Pass/Ticket ID (e.g. TP-901)" class="w-full border p-2 rounded-lg font-mono">
+          <button onclick="boothScanQR()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg">Scan & Validate Gate Passage</button>
+        </div>
+        <div id="scanResult" class="hidden p-3 bg-slate-50 border rounded-lg text-xs space-y-1"></div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+        <h4 class="font-bold text-slate-900">Update Plaza Location & Operational Status</h4>
+        <div class="space-y-2 text-xs">
+          <input id="boothLocName" value="Perungudi Express Toll Plaza, OMR Mile 12" class="w-full border p-2 rounded-lg">
+          <button onclick="alert('Plaza location status updated.')" class="w-full bg-slate-800 text-white font-bold py-2 rounded-lg">Update Location Data</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminTollView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">Highways Authority Admin Control</h3>
+        <p class="text-xs text-amber-700">Approve recurring toll passes, generate official QR hashes, and create toll plaza rate structures.</p>
+      </div>
+      <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Admin Auth: Active</span>
+    </div>
+
+    <!-- Passes Approval Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Pending Toll Pass Applications (Approve & Issue QR)</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Application ID</th>
+              <th class="p-3">Applicant</th>
+              <th class="p-3">Vehicle</th>
+              <th class="p-3">Duration</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Approval Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminPassesTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Highway Toll Transaction Monitor</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX15</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[EASYTOLL] Automated Electronic Toll Collection (ETC) System ready.</div>
+        <div>[EWALLET] Linked Driver eWallet balance: Rs. 850. RFID QR Generator ready.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div id="qrModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-3">
+      <h3 class="font-bold text-base text-slate-900">FASTag Toll Gate QR Pass</h3>
+      <p id="qrDesc" class="text-xs text-slate-500"></p>
+      
+      <!-- Simulated High-Res SVG QR Code -->
+      <div class="bg-slate-100 p-4 rounded-xl flex items-center justify-center">
+        <svg class="w-40 h-40" viewBox="0 0 100 100">
+          <rect width="100" height="100" fill="#fff" />
+          <path d="M10 10h30v30h-30z M60 10h30v30h-30z M10 60h30v30h-30z" fill="#000" />
+          <path d="M15 15h20v20h-20z M65 15h20v20h-20z M15 65h20v20h-20z" fill="#fff" />
+          <path d="M20 20h10v10h-10z M70 20h10v10h-10z M20 70h10v10h-10z" fill="#000" />
+          <rect x="45" y="10" width="10" height="10" fill="#000" />
+          <rect x="45" y="30" width="10" height="10" fill="#000" />
+          <rect x="10" y="45" width="10" height="10" fill="#000" />
+          <rect x="30" y="45" width="10" height="10" fill="#000" />
+          <rect x="60" y="45" width="20" height="10" fill="#000" />
+          <rect x="45" y="60" width="10" height="30" fill="#000" />
+          <rect x="60" y="70" width="20" height="20" fill="#000" />
+        </svg>
+      </div>
+
+      <div class="text-xs text-slate-600 font-mono font-bold" id="qrHashLbl">TP-901-VALID</div>
+      <button onclick="closeModal('qrModal')" class="w-full bg-slate-800 text-white py-2 rounded-lg text-xs font-bold">Done</button>
+    </div>
+  </div>
+
+  <script>
+    let walletBal = 850;
+    let tollPasses = [
+      { id: "TP-901", plaza: "Perungudi Plaza (OMR)", veh: "TN 09 BX 4412", validity: "Valid for 30 Days", status: "Approved" }
+    ];
+
+    let pendingPasses = [
+      { id: "APP-402", user: "Winston Y.", veh: "TN 09 BX 4412", duration: "Quarterly Pass", status: "Pending" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderTables() {
+      const tb = document.getElementById('driverPassTable');
+      tb.innerHTML = '';
+      tollPasses.forEach(p => {
+        tb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-emerald-700">${p.id}</td>
+            <td class="p-3 font-medium">${p.plaza}</td>
+            <td class="p-3 font-mono font-bold">${p.veh}</td>
+            <td class="p-3 text-xs">${p.validity}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${p.status}</span></td>
+            <td class="p-3 text-right">
+              <button onclick="viewQR('${p.id}', '${p.veh}')" class="text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg font-bold">Show QR</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      const atb = document.getElementById('adminPassesTable');
+      atb.innerHTML = '';
+      pendingPasses.forEach(p => {
+        atb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold">${p.id}</td>
+            <td class="p-3 font-semibold">${p.user}</td>
+            <td class="p-3 font-mono">${p.veh}</td>
+            <td class="p-3">${p.duration}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">${p.status}</span></td>
+            <td class="p-3 text-right">
+              <button onclick="adminApprovePass('${p.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded font-bold">Approve & Generate QR</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function buyTollTicket() {
+      const plaza = document.getElementById('tollPlazaSelect').value;
+      const veh = document.getElementById('vehReg').value;
+      const fare = plaza.includes('35') ? 35 : (plaza.includes('65') ? 65 : 90);
+
+      if (walletBal < fare) { alert("Insufficient eWallet balance."); return; }
+      walletBal -= fare;
+      document.getElementById('userWalletBal').textContent = "Rs. " + walletBal;
+
+      const tktId = "TK-" + Math.floor(1000 + Math.random() * 9000);
+      tollPasses.push({ id: tktId, plaza, veh, validity: "Single Trip (24 hrs)", status: "Paid / Active" });
+      renderTables();
+      logOut(`[TOLL ETICKET PURCHASED] ${tktId} issued for ${veh} at ${plaza}. Deducted Rs. ${fare} from eWallet.`);
+      alert(`eTicket ${tktId} generated! Present QR code at toll barrier.`);
+    }
+
+    function applyTollPass() {
+      const dur = document.getElementById('passDuration').value;
+      const appId = "APP-" + Math.floor(100 + Math.random() * 900);
+      pendingPasses.push({ id: appId, user: "Winston Y.", veh: "TN 09 BX 4412", duration: dur, status: "Pending" });
+      renderTables();
+      logOut(`[PASS APPLICATION] ${appId} for ${dur} submitted to Highway Authority for approval.`);
+      alert(`Application ${appId} submitted! Admin will approve and generate QR code.`);
+    }
+
+    function adminApprovePass(appId) {
+      const a = pendingPasses.find(x => x.id === appId);
+      if (a) {
+        pendingPasses = pendingPasses.filter(x => x.id !== appId);
+        const passId = "TP-" + Math.floor(100 + Math.random() * 900);
+        tollPasses.push({ id: passId, plaza: "All Inter-State Plazas", veh: a.veh, validity: a.duration, status: "Approved" });
+        renderTables();
+        logOut(`[ADMIN APPROVAL] Pass application ${appId} approved. Dynamic QR code generated with ID: ${passId}.`);
+        alert(`Pass ${passId} approved with QR code!`);
+      }
+    }
+
+    function boothScanQR() {
+      const code = document.getElementById('scanPassInput').value.trim();
+      const p = tollPasses.find(x => x.id.toLowerCase() === code.toLowerCase());
+      const res = document.getElementById('scanResult');
+      res.classList.remove('hidden');
+
+      if (p) {
+        res.innerHTML = `
+          <div class="text-emerald-700 font-bold">✅ PASS VALIDATED - BARRIER OPEN</div>
+          <div>Pass ID: ${p.id} | Vehicle: ${p.veh}</div>
+          <div>Plaza: ${p.plaza} | Status: ${p.status}</div>
+        `;
+        logOut(`[BOOTH SCAN] Pass ${p.id} successfully verified for ${p.veh}. Boom barrier opened.`);
+      } else {
+        res.innerHTML = `<div class="text-rose-600 font-bold">❌ INVALID OR EXPIRED TOLL CODE</div>`;
+        logOut(`[BOOTH SCAN FAILED] Scan rejected for input: "${code}".`);
+      }
+    }
+
+    function viewQR(id, veh) {
+      document.getElementById('qrDesc').textContent = `Pass ID: ${id} | Vehicle: ${veh}`;
+      document.getElementById('qrHashLbl').textContent = `${id}-${veh.replace(/ /g,'')}-VERIFIED`;
+      openModal('qrModal');
+    }
+
+    function addMoneyModal() {
+      const amt = prompt("Enter amount to reload into eWallet (Rs):", "500");
+      if (amt) {
+        walletBal += parseInt(amt);
+        document.getElementById('userWalletBal').textContent = "Rs. " + walletBal;
+        logOut(`[WALLET RELOAD] Rs. ${amt} credited to eWallet via UPI payment gateway.`);
+        alert(`Rs. ${amt} added successfully! New Balance: Rs. ${walletBal}`);
+      }
+    }
+
+    function toggleTollRole(r) {
+      ['driverView', 'boothView', 'adminTollView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['btnD', 'btnB', 'btnA'].forEach(id => document.getElementById(id).className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700');
+
+      if (r === 'driver') {
+        document.getElementById('driverView').classList.remove('hidden');
+        document.getElementById('btnD').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white';
+      } else if (r === 'booth') {
+        document.getElementById('boothView').classList.remove('hidden');
+        document.getElementById('btnB').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white';
+      } else {
+        document.getElementById('adminTollView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white';
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    renderTables();
+  </script>
+</body>
+</html>

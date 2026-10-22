@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeFinder - Online Real Estate & Property Booking</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🏡</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">HomeFinder Real Estate</span>
+          <span class="ml-2 text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">Exp 11: Real Estate</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleHomeView('buyer')" id="btnB" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white">Buyer View</button>
+        <button onclick="toggleHomeView('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Broker Admin</button>
+        <button onclick="openModal('emiModal')" class="text-xs px-3 py-1.5 bg-emerald-50 text-emerald-800 font-bold rounded-lg border border-emerald-200">💰 Mortgage EMI</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- BUYER VIEW -->
+  <main id="buyerView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-emerald-700 via-teal-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-2">Find Lands, Villas, Apartments & Commercial Spaces</h2>
+      <p class="text-emerald-100 text-xs mb-4">Save your custom search criteria for recurring lookups and schedule on-site viewings.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 bg-white text-slate-800 p-4 rounded-xl">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Location / City</label>
+          <select id="propCity" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Cities</option>
+            <option value="Chennai">Chennai OMR</option>
+            <option value="Bangalore">Bangalore Whitefield</option>
+            <option value="Hyderabad">Hyderabad Hitec City</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Property Type</label>
+          <select id="propType" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Types</option>
+            <option value="Villa">Luxury Villa</option>
+            <option value="Apartment">Apartment Flat</option>
+            <option value="Land">Residential Plot / Land</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Max Budget</label>
+          <select id="propBudget" class="w-full border p-2 rounded-lg text-sm">
+            <option value="999999999">Any Budget</option>
+            <option value="8000000">Under Rs. 80 Lakhs</option>
+            <option value="20000000">Under Rs. 2 Crores</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="saveSearchCriteria()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-lg text-xs border">💾 Save Criteria</button>
+        </div>
+        <div class="flex items-end">
+          <button onclick="searchProperties()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-sm">Find Homes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listings Grid -->
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Verified Property Listings</h3>
+      <div id="propGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- Scheduled Viewings & Inquiries -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">My Scheduled Property Viewings</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Ref ID</th>
+              <th class="p-3">Property</th>
+              <th class="p-3">Location</th>
+              <th class="p-3">Viewing Schedule</th>
+              <th class="p-3">Assigned Agent</th>
+              <th class="p-3 text-right">Status</th>
+            </tr>
+          </thead>
+          <tbody id="viewingsTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminHomeView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">Brokerage Administration & Visitor Record Logger</h3>
+        <p class="text-xs text-amber-700">Add property listings, manage real estate agents, monitor valuation estimates, and view customer visit logs.</p>
+      </div>
+      <button onclick="logValuation()" class="bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-lg">Property Valuation Tool</button>
+    </div>
+
+    <!-- Add Property Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Post New Property Listing</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Property Title</label>
+          <input id="admPropTitle" value="Emerald Crest 4BHK Villa" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">City / Neighborhood</label>
+          <input id="admPropCity" value="Chennai OMR" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Type</label>
+          <select id="admPropType" class="w-full border p-2 rounded-lg text-xs">
+            <option>Villa</option>
+            <option>Apartment</option>
+            <option>Land</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Price (Rs)</label>
+          <input id="admPropPrice" type="number" value="18500000" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="md:col-span-3">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Amenities</label>
+          <input id="admPropAmen" value="Private Pool, Clubhouse, 24/7 Security, Solar Power, Garden" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="flex items-end">
+          <button onclick="adminAddProperty()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs">Publish Property</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Real Estate Operations Log</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX11</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[HOMEFINDER] Property Database loaded. Geo-location markers active.</div>
+        <div>[SEARCH-CRITERIA] Dynamic profile search criteria persistence enabled.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMI Calculator Modal -->
+  <div id="emiModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-3 text-xs">
+      <h3 class="font-bold text-base text-slate-900">Mortgage EMI Calculator</h3>
+      <div>
+        <label class="block text-slate-500 mb-1">Loan Amount (Rs)</label>
+        <input id="emiPrincipal" value="5000000" class="w-full border p-2 rounded-lg">
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-slate-500 mb-1">Interest Rate (%)</label>
+          <input id="emiRate" value="8.5" class="w-full border p-2 rounded-lg">
+        </div>
+        <div>
+          <label class="block text-slate-500 mb-1">Tenure (Years)</label>
+          <input id="emiTenure" value="20" class="w-full border p-2 rounded-lg">
+        </div>
+      </div>
+      <button onclick="calculateEmi()" class="w-full bg-emerald-600 text-white font-bold py-2 rounded-lg">Calculate EMI</button>
+      <div id="emiResult" class="font-bold text-center text-sm text-emerald-800 bg-emerald-50 p-2 rounded-lg">Approx. EMI: Rs. 43,391 / mo</div>
+      <button onclick="closeModal('emiModal')" class="w-full border py-1 rounded-lg">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let properties = [
+      { id: 1, title: "Grand Horizon Sea-View Villa", city: "Chennai", type: "Villa", price: 17500000, beds: "4 BHK", icon: "🏖️", amenities: "Private Pool, Ocean Facing, 3 Car Parks" },
+      { id: 2, title: "TechPark Heights Smart Flat", city: "Bangalore", type: "Apartment", price: 7800000, beds: "3 BHK", icon: "🏙️", amenities: "EV Charging, Gym, High-Speed Fiber" },
+      { id: 3, title: "CyberMeadows Gated Villa Plot", city: "Hyderabad", type: "Land", price: 4500000, beds: "2400 sq.ft", icon: "🌳", amenities: "Clear Title, DTCP Approved, 40ft Road" }
+    ];
+
+    let viewings = [
+      { id: "VW-201", prop: "Grand Horizon Sea-View Villa", city: "Chennai", schedule: "2026-10-29 (03:00 PM)", agent: "Kavita Reddy (Lic #8841)", status: "Confirmed" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderProperties(list = properties) {
+      const g = document.getElementById('propGrid');
+      g.innerHTML = '';
+      list.forEach(p => {
+        g.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="text-5xl mb-3 text-center">${p.icon}</div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded">${p.type}</span>
+                <span class="text-xs text-slate-500 font-semibold">${p.beds}</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm mt-1">${p.title}</h4>
+              <p class="text-xs text-slate-500 mt-0.5">Location: ${p.city}</p>
+              <p class="text-xs text-slate-600 mt-2">Amenities: ${p.amenities}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t flex justify-between items-center">
+              <span class="text-base font-extrabold text-emerald-800">Rs. ${(p.price / 100000).toFixed(1)} L</span>
+              <button onclick="scheduleViewing('${p.title}', '${p.city}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg">Schedule Viewing</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderViewings() {
+      const tb = document.getElementById('viewingsTable');
+      tb.innerHTML = '';
+      viewings.forEach(v => {
+        tb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-emerald-700">${v.id}</td>
+            <td class="p-3 font-semibold">${v.prop}</td>
+            <td class="p-3">${v.city}</td>
+            <td class="p-3">${v.schedule}</td>
+            <td class="p-3 text-xs text-slate-600">${v.agent}</td>
+            <td class="p-3 text-right"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${v.status}</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    function scheduleViewing(title, city) {
+      const dt = prompt(`Enter preferred date and time for viewing ${title}:`, "2026-11-04 (11:00 AM)");
+      if (!dt) return;
+      const newId = "VW-" + Math.floor(100 + Math.random() * 900);
+      viewings.push({ id: newId, prop: title, city, schedule: dt, agent: "Kavita Reddy (Premier Broker)", status: "Confirmed" });
+      renderViewings();
+      logOut(`[VIEWING SCHEDULED] Reference ${newId} confirmed for ${title} on ${dt}. Agent alerted.`);
+      alert(`Property viewing booked! ID: ${newId}`);
+    }
+
+    function saveSearchCriteria() {
+      const c = document.getElementById('propCity').value;
+      const t = document.getElementById('propType').value;
+      const b = document.getElementById('propBudget').value;
+      localStorage.setItem('homefinder_criteria', JSON.stringify({ c, t, b }));
+      logOut(`[SEARCH SAVED] Preferred criteria stored: City=${c}, Type=${t}, Budget=${b}. Saved to buyer profile.`);
+      alert("Search criteria successfully saved to your profile for 1-click re-search!");
+    }
+
+    function searchProperties() {
+      const c = document.getElementById('propCity').value;
+      const t = document.getElementById('propType').value;
+      const b = parseFloat(document.getElementById('propBudget').value);
+
+      const f = properties.filter(p => {
+        return (c === 'All' || p.city === c) &&
+               (t === 'All' || p.type === t) &&
+               p.price <= b;
+      });
+      renderProperties(f);
+      logOut(`[PROPERTY QUERY] Search found ${f.length} listings.`);
+    }
+
+    function calculateEmi() {
+      const P = parseFloat(document.getElementById('emiPrincipal').value);
+      const R = parseFloat(document.getElementById('emiRate').value) / (12 * 100);
+      const N = parseFloat(document.getElementById('emiTenure').value) * 12;
+      const emi = Math.round((P * R * Math.pow(1 + R, N)) / (Math.pow(1 + R, N) - 1));
+      document.getElementById('emiResult').textContent = `Estimated Monthly EMI: Rs. ${emi.toLocaleString()}`;
+    }
+
+    function adminAddProperty() {
+      const title = document.getElementById('admPropTitle').value;
+      const city = document.getElementById('admPropCity').value;
+      const type = document.getElementById('admPropType').value;
+      const price = parseFloat(document.getElementById('admPropPrice').value);
+      const amen = document.getElementById('admPropAmen').value;
+
+      properties.push({ id: properties.length + 1, title, city, type, price, beds: "Custom", icon: "🏢", amenities: amen });
+      renderProperties();
+      logOut(`[ADMIN LISTING] ${title} in ${city} published at Rs. ${(price/100000).toFixed(1)} L.`);
+      alert(`${title} added to real estate database!`);
+    }
+
+    function logValuation() {
+      logOut(`[VALUATION TOOL] Automated neighborhood valuation calculated: Mean square-foot rate: Rs. 6,850/sq.ft (OMR Sector).`);
+      alert("Property valuation report estimated based on neighborhood DTCP trends.");
+    }
+
+    function toggleHomeView(v) {
+      if (v === 'admin') {
+        document.getElementById('buyerView').classList.add('hidden');
+        document.getElementById('adminHomeView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white';
+        document.getElementById('btnB').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      } else {
+        document.getElementById('adminHomeView').classList.add('hidden');
+        document.getElementById('buyerView').classList.remove('hidden');
+        document.getElementById('btnB').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white';
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    renderProperties();
+    renderViewings();
+  </script>
+</body>
+</html>

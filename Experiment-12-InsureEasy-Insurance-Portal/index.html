@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InsureEasy - Online Insurance Management Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🛡️</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">InsureEasy Global</span>
+          <span class="ml-2 text-xs bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded-full border border-indigo-200">Exp 12: Insurance</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleRole('user')" id="btnU" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white">Policyholder</button>
+        <button onclick="toggleRole('agent')" id="btnAg" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Insurance Agent</button>
+        <button onclick="toggleRole('admin')" id="btnAd" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- USER / POLICYHOLDER VIEW -->
+  <main id="userView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-indigo-800 via-blue-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-2">Compare & Secure Health, Auto & Home Insurance</h2>
+      <p class="text-indigo-200 text-xs mb-4">Real-time policy comparison, automated premium renewal SMS alerts, and seamless online claims filing.</p>
+      
+      <!-- Compare Policies Bar -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white text-slate-800 p-4 rounded-xl">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Insurance Type</label>
+          <select id="insType" onchange="filterPolicies()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Types</option>
+            <option value="Health">Health Insurance</option>
+            <option value="Auto">Auto / Car Insurance</option>
+            <option value="Home">Home & Property</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Coverage Amount</label>
+          <select id="insCoverage" onchange="filterPolicies()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">Any Coverage</option>
+            <option value="5L">Rs. 5,00,000</option>
+            <option value="20L">Rs. 20,00,000</option>
+            <option value="50L">Rs. 50,00,000</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Deductible Preference</label>
+          <select class="w-full border p-2 rounded-lg text-sm">
+            <option>Zero Copay / Deductible</option>
+            <option>Standard 5% Deductible</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="filterPolicies()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-sm">Compare Plans</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Policy Catalog -->
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Recommended Policy Comparison</h3>
+      <div id="policyGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- Active Policies & Claims -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h4 class="font-bold text-slate-900">My Active Policies & Upcoming Due Dates</h4>
+          <p class="text-xs text-slate-500">Automated SMS alerts dispatched 7 days prior to expiry.</p>
+        </div>
+        <button onclick="openModal('claimModal')" class="bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-1.5 rounded-lg">File an Insurance Claim</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Policy #</th>
+              <th class="p-3">Plan Name</th>
+              <th class="p-3">Coverage</th>
+              <th class="p-3">Premium</th>
+              <th class="p-3">Renewal Due</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Pay Premium</th>
+            </tr>
+          </thead>
+          <tbody id="userPoliciesTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AGENT VIEW -->
+  <main id="agentView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-blue-900">Certified Agent Workstation</h3>
+        <p class="text-xs text-blue-700">Create customers, manage policy portfolios, and dispatch SMS alerts before dues exceed.</p>
+      </div>
+      <span class="text-xs bg-blue-200 text-blue-900 font-bold px-3 py-1 rounded-full">Agent: Vikram Malhotra (Approved)</span>
+    </div>
+
+    <!-- Create Customer Policy Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Create New Customer Policy</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Customer Full Name</label>
+          <input id="agCustName" value="Kiran Kumar" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Mobile (for SMS Alert)</label>
+          <input id="agCustPhone" value="+91 98401 23456" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Select Policy Plan</label>
+          <select id="agCustPlan" class="w-full border p-2 rounded-lg text-xs">
+            <option>CareHealth 360 (Health)</option>
+            <option>DriveShield Comprehensive (Auto)</option>
+            <option>HomeSafe All-Risk (Home)</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="agentCreatePolicy()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs">Issue Customer Policy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent Portfolio Table & SMS Alert Sender -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Managed Customer Policies & SMS Alert Console</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Policy ID</th>
+              <th class="p-3">Customer</th>
+              <th class="p-3">Mobile</th>
+              <th class="p-3">Plan</th>
+              <th class="p-3">Due Date</th>
+              <th class="p-3 text-right">Dispatch Alert</th>
+            </tr>
+          </thead>
+          <tbody id="agentClientsTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">Insurance Head Office: Agent Approval & Audit</h3>
+        <p class="text-xs text-amber-700">Approve agent registration logins, audit commission metrics, and oversee claims.</p>
+      </div>
+      <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Admin Auth: Active</span>
+    </div>
+
+    <!-- Agent Approvals -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Registered Agents & Approval Status</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Agent ID</th>
+              <th class="p-3">Name</th>
+              <th class="p-3">Region</th>
+              <th class="p-3">Active Policies</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Approval</th>
+            </tr>
+          </thead>
+          <tbody id="adminAgentsTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Insurance Ledger & SMS Alert Monitor</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX12</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[INSUREEASY] Insurance Underwriting Engine Online. 3 Categories loaded.</div>
+        <div>[SMS-GATEWAY] Automated SMS alert daemon active for policy expiration and due notices.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claim Modal -->
+  <div id="claimModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-3 text-xs">
+      <h3 class="font-bold text-base text-slate-900">File Insurance Claim</h3>
+      <div>
+        <label class="block text-slate-500 mb-1">Select Active Policy</label>
+        <select class="w-full border p-2 rounded-lg">
+          <option>POL-1082 (CareHealth 360)</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-slate-500 mb-1">Incident Date & Description</label>
+        <textarea rows="2" placeholder="Describe hospitalization, accident, or property loss..." class="w-full border p-2 rounded-lg"></textarea>
+      </div>
+      <div>
+        <label class="block text-slate-500 mb-1">Claim Amount Requested (Rs)</label>
+        <input type="number" value="45000" class="w-full border p-2 rounded-lg">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('claimModal')" class="px-4 py-2 border rounded-lg">Cancel</button>
+        <button onclick="submitClaim()" class="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg">Submit Claim</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let policies = [
+      { id: 1, name: "CareHealth 360 Comprehensive", type: "Health", coverage: "Rs. 20 Lakhs", premium: 14500, copay: "0%", features: "Cashless in 6,000+ hospitals, OPD cover, AYUSH included" },
+      { id: 2, name: "DriveShield Bumper-to-Bumper", type: "Auto", coverage: "IDV Rs. 8.5 Lakhs", premium: 8200, copay: "Zero Dep", features: "Roadside assistance, engine protector, consumables cover" },
+      { id: 3, name: "HomeSafe Total Structure & Content", type: "Home", coverage: "Rs. 50 Lakhs", premium: 5400, copay: "None", features: "Fire, burglary, flood, earthquake, electronic equipment protection" }
+    ];
+
+    let userPolicies = [
+      { id: "POL-1082", plan: "CareHealth 360 Comprehensive", coverage: "Rs. 20 L", premium: 14500, due: "2026-11-20", status: "Active" }
+    ];
+
+    let agentClients = [
+      { polId: "POL-1082", customer: "Winston Y.", phone: "+91 98401 23456", plan: "CareHealth 360", due: "2026-11-20" },
+      { polId: "POL-1094", customer: "Pooja Hegde", phone: "+91 94440 98765", plan: "DriveShield Auto", due: "2026-10-29" }
+    ];
+
+    let agents = [
+      { id: "AG-101", name: "Vikram Malhotra", region: "South Region", count: 28, status: "Approved" },
+      { id: "AG-102", name: "Ananya Deshmukh", region: "West Region", count: 14, status: "Pending Approval" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderPolicies(list = policies) {
+      const g = document.getElementById('policyGrid');
+      g.innerHTML = '';
+      list.forEach(p => {
+        g.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded">${p.type}</span>
+              <h4 class="font-bold text-slate-900 text-base mt-2">${p.name}</h4>
+              <p class="text-xs text-slate-500 mt-1">Sum Insured: <span class="font-bold text-slate-800">${p.coverage}</span></p>
+              <p class="text-xs text-slate-600 mt-2">${p.features}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t flex justify-between items-center">
+              <div>
+                <span class="text-lg font-extrabold text-indigo-700">Rs. ${p.premium}</span>
+                <span class="text-xs text-slate-400">/ yr</span>
+              </div>
+              <button onclick="buyPolicy(${p.id})" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition">Apply Online</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderTables() {
+      const ut = document.getElementById('userPoliciesTable');
+      ut.innerHTML = '';
+      userPolicies.forEach(u => {
+        ut.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-indigo-600">${u.id}</td>
+            <td class="p-3 font-semibold">${u.plan}</td>
+            <td class="p-3">${u.coverage}</td>
+            <td class="p-3 font-bold">Rs. ${u.premium}</td>
+            <td class="p-3 text-xs text-rose-600 font-semibold">${u.due}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${u.status}</span></td>
+            <td class="p-3 text-right">
+              <button onclick="payPremium('${u.id}', ${u.premium})" class="text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-2.5 py-1 rounded-lg font-bold">Pay Now</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      const at = document.getElementById('agentClientsTable');
+      at.innerHTML = '';
+      agentClients.forEach(c => {
+        at.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold">${c.polId}</td>
+            <td class="p-3 font-semibold">${c.customer}</td>
+            <td class="p-3 text-xs">${c.phone}</td>
+            <td class="p-3">${c.plan}</td>
+            <td class="p-3 text-xs font-bold text-rose-600">${c.due}</td>
+            <td class="p-3 text-right">
+              <button onclick="sendDueSms('${c.customer}', '${c.phone}', '${c.due}')" class="text-xs bg-blue-600 text-white hover:bg-blue-700 px-2.5 py-1 rounded-lg font-bold">📲 Send SMS Alert</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      const adt = document.getElementById('adminAgentsTable');
+      adt.innerHTML = '';
+      agents.forEach(a => {
+        adt.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold">${a.id}</td>
+            <td class="p-3 font-semibold">${a.name}</td>
+            <td class="p-3">${a.region}</td>
+            <td class="p-3 font-bold">${a.count}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${a.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${a.status}</span></td>
+            <td class="p-3 text-right">
+              ${a.status !== 'Approved' ? `<button onclick="approveAgent('${a.id}')" class="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold">Approve Login</button>` : `<span class="text-xs text-slate-400">Verified</span>`}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function buyPolicy(id) {
+      const p = policies.find(x => x.id === id);
+      const newId = "POL-" + Math.floor(1000 + Math.random() * 9000);
+      userPolicies.push({ id: newId, plan: p.name, coverage: p.coverage, premium: p.premium, due: "2027-10-22", status: "Active" });
+      renderTables();
+      logOut(`[NEW POLICY ISSUED] Policy ${newId} (${p.name}) activated. Premium: Rs. ${p.premium}. Confirmation SMS sent.`);
+      alert(`Policy ${newId} successfully purchased!`);
+    }
+
+    function payPremium(id, amt) {
+      logOut(`[PREMIUM PAYMENT] Payment of Rs. ${amt} for policy ${id} processed successfully via digital gateway.`);
+      alert(`Premium for ${id} paid! Next due date extended by 1 year.`);
+    }
+
+    function sendDueSms(customer, phone, due) {
+      logOut(`[SMS ALERT SENT] Dispatched to ${customer} (${phone}): "Dear ${customer}, your policy premium is due on ${due}. Pay now on InsureEasy to maintain coverage."`);
+      alert(`SMS Reminder successfully dispatched to ${customer} at ${phone}!`);
+    }
+
+    function approveAgent(id) {
+      const a = agents.find(x => x.id === id);
+      if (a) {
+        a.status = "Approved";
+        renderTables();
+        logOut(`[ADMIN APPROVAL] Agent ${id} (${a.name}) login approved by Administrator.`);
+        alert(`Agent ${a.name} approved!`);
+      }
+    }
+
+    function agentCreatePolicy() {
+      const name = document.getElementById('agCustName').value;
+      const phone = document.getElementById('agCustPhone').value;
+      const plan = document.getElementById('agCustPlan').value;
+      const id = "POL-" + Math.floor(1000 + Math.random() * 9000);
+
+      agentClients.push({ polId: id, customer: name, phone, plan, due: "2026-11-25" });
+      renderTables();
+      logOut(`[AGENT ISSUANCE] Agent issued policy ${id} for customer ${name}. Notification queued.`);
+      alert(`Policy ${id} created for ${name}!`);
+    }
+
+    function submitClaim() {
+      closeModal('claimModal');
+      logOut(`[CLAIM REGISTERED] Medical claim submitted for POL-1082. Adjudication team assigned.`);
+      alert("Insurance claim submitted successfully! Claim ID: CLM-8821.");
+    }
+
+    function filterPolicies() {
+      const t = document.getElementById('insType').value;
+      const f = policies.filter(p => t === 'All' || p.type === t);
+      renderPolicies(f);
+    }
+
+    function toggleRole(r) {
+      ['userView', 'agentView', 'adminView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['btnU', 'btnAg', 'btnAd'].forEach(id => document.getElementById(id).className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700');
+
+      if (r === 'user') {
+        document.getElementById('userView').classList.remove('hidden');
+        document.getElementById('btnU').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      } else if (r === 'agent') {
+        document.getElementById('agentView').classList.remove('hidden');
+        document.getElementById('btnAg').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      } else {
+        document.getElementById('adminView').classList.remove('hidden');
+        document.getElementById('btnAd').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    renderPolicies();
+    renderTables();
+  </script>
+</body>
+</html>

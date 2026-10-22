@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TalentSphere - Online Job Recruitment Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">💼</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">TalentSphere</span>
+          <span class="ml-2 text-xs bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded-full border border-indigo-200">Exp 21: Job Recruitment</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleJobRole('seeker')" id="btnS" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white">Job Seeker</button>
+        <button onclick="toggleJobRole('director')" id="btnD" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Company Recruiter</button>
+        <button onclick="toggleJobRole('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- JOB SEEKER VIEW -->
+  <main id="seekerView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-indigo-800 via-blue-900 to-slate-900 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-1">Explore Open Positions & Apply with Resume</h2>
+      <p class="text-indigo-200 text-xs mb-4">Set granular privacy controls across employers and receive real-time interview notifications.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white text-slate-800 p-4 rounded-xl">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Keywords</label>
+          <input id="jobKeyword" onkeyup="filterJobs()" placeholder="e.g. Fullstack, Python, Cloud..." class="w-full border p-2 rounded-lg text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Category</label>
+          <select id="jobCat" onchange="filterJobs()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Categories</option>
+            <option value="Software">Software Engineering</option>
+            <option value="Data">Data & AI</option>
+            <option value="Design">Product Design</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Location</label>
+          <select id="jobLoc" onchange="filterJobs()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Locations</option>
+            <option value="Bangalore">Bangalore</option>
+            <option value="Chennai">Chennai</option>
+            <option value="Remote">Remote</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button onclick="filterJobs()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-sm">Find Jobs</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vacancies Grid -->
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Active Vacancies</h3>
+      <div id="vacanciesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- Applications History -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">My Submitted Applications & Status</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">App ID</th>
+              <th class="p-3">Job Role</th>
+              <th class="p-3">Company</th>
+              <th class="p-3">Resume Submitted</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Privacy Level</th>
+            </tr>
+          </thead>
+          <tbody id="userAppsTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- RECRUITER / DIRECTOR VIEW -->
+  <main id="directorView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-blue-900">Company Director / HR Workstation</h3>
+        <p class="text-xs text-blue-700">Post open vacancies, browse candidate resumes, and shortlist qualified engineers.</p>
+      </div>
+      <span class="text-xs bg-blue-200 text-blue-900 font-bold px-3 py-1 rounded-full">Recruiter: TechCorp Global (Approved)</span>
+    </div>
+
+    <!-- Post Vacancy Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Post New Job Vacancy</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Job Title</label>
+          <input id="newJobTitle" value="Senior Backend Architect" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+          <select id="newJobCat" class="w-full border p-2 rounded-lg text-xs">
+            <option>Software</option>
+            <option>Data</option>
+            <option>Design</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Location</label>
+          <input id="newJobLoc" value="Bangalore / Hybrid" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Annual CTC</label>
+          <input id="newJobSalary" value="Rs. 24 - 32 LPA" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="md:col-span-3">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Role Description</label>
+          <input id="newJobDesc" value="Lead distributed microservices migration with Go, Kubernetes, and PostgreSQL." class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="flex items-end">
+          <button onclick="directorPostJob()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg text-xs">Publish Vacancy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Applied Candidates Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Applicants & Resume Screening</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Applicant Name</th>
+              <th class="p-3">Applied Position</th>
+              <th class="p-3">Resume Link</th>
+              <th class="p-3">Current Decision</th>
+              <th class="p-3 text-right">Shortlist</th>
+            </tr>
+          </thead>
+          <tbody id="directorApplicantsTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminJobView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">TalentSphere Platform Oversight</h3>
+        <p class="text-xs text-amber-700">Approve company director registrations and audit hiring statistics reports.</p>
+      </div>
+      <button onclick="viewReport()" class="bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Generate Hiring Report</button>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Pending Company Approvals</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Company</th>
+              <th class="p-3">Director</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="p-3 font-bold">InnoTech Solutions</td>
+              <td class="p-3">Vikram Sen</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Pending</span></td>
+              <td class="p-3 text-right"><button onclick="alert('Company verified!')" class="text-xs bg-emerald-600 text-white px-3 py-1 rounded font-bold">Approve</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Recruitment Platform Console</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX21</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[TALENTSPHERE] Job Recruitment Engine Loaded. 3 Employment Sectors active.</div>
+        <div>[RESUME-ROUTER] Secure PDF resume upload and privacy shielding online.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let vacancies = [
+      { id: 1, title: "Senior Fullstack Engineer", company: "TechCorp Global", cat: "Software", loc: "Bangalore", salary: "Rs. 22 - 30 LPA", desc: "Build scalable React & Node.js cloud microservices." },
+      { id: 2, name: "Lead Data Scientist", company: "DataMinds AI", cat: "Data", loc: "Remote", salary: "Rs. 28 - 38 LPA", desc: "Fine-tune LLM foundation models and statistical pipelines." },
+      { id: 3, name: "Principal UI/UX Designer", company: "PixelCraft Studios", cat: "Design", loc: "Chennai", salary: "Rs. 18 - 25 LPA", desc: "Craft design systems and interactive web experiences." }
+    ];
+
+    let applications = [
+      { id: "APP-901", candidate: "Winston Y.", role: "Senior Fullstack Engineer", company: "TechCorp Global", resume: "winston_resume.pdf", status: "Shortlisted", privacy: "Confidential (Current Employer Hidden)" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderVacancies(list = vacancies) {
+      const g = document.getElementById('vacanciesGrid');
+      g.innerHTML = '';
+      list.forEach(v => {
+        g.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded">${v.cat}</span>
+              <h4 class="font-bold text-slate-900 text-base mt-2">${v.title || v.name}</h4>
+              <p class="text-xs text-slate-500 font-semibold">${v.company} • ${v.loc}</p>
+              <p class="text-xs text-emerald-700 font-bold mt-1">${v.salary}</p>
+              <p class="text-xs text-slate-600 mt-2">${v.desc}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t flex justify-end">
+              <button onclick="applyJob('${v.title || v.name}', '${v.company}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition">Apply Now</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderApps() {
+      const ut = document.getElementById('userAppsTable');
+      const dt = document.getElementById('directorApplicantsTable');
+      ut.innerHTML = '';
+      dt.innerHTML = '';
+
+      applications.forEach(a => {
+        ut.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-indigo-600">${a.id}</td>
+            <td class="p-3 font-semibold">${a.role}</td>
+            <td class="p-3">${a.company}</td>
+            <td class="p-3 text-xs text-blue-600 underline font-mono">${a.resume}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${a.status}</span></td>
+            <td class="p-3 text-right text-xs text-slate-500">${a.privacy}</td>
+          </tr>
+        `;
+
+        dt.innerHTML += `
+          <tr>
+            <td class="p-3 font-bold">${a.candidate}</td>
+            <td class="p-3">${a.role}</td>
+            <td class="p-3 text-xs text-indigo-600 font-mono">${a.resume}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${a.status}</span></td>
+            <td class="p-3 text-right">
+              <button onclick="alert('Interview scheduled!')" class="text-xs bg-indigo-600 text-white px-3 py-1 rounded font-bold">Schedule Interview</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function applyJob(role, company) {
+      const newId = "APP-" + Math.floor(100 + Math.random() * 900);
+      applications.push({ id: newId, candidate: "Winston Y.", role, company, resume: "winston_resume.pdf", status: "Submitted", privacy: "Standard" });
+      renderApps();
+      logOut(`[JOB APPLIED] Application ${newId} submitted for "${role}" at ${company}. Resume forwarded.`);
+      alert(`Applied to ${role}! Employer notified.`);
+    }
+
+    function directorPostJob() {
+      const title = document.getElementById('newJobTitle').value;
+      const cat = document.getElementById('newJobCat').value;
+      const loc = document.getElementById('newJobLoc').value;
+      const salary = document.getElementById('newJobSalary').value;
+      const desc = document.getElementById('newJobDesc').value;
+
+      vacancies.push({ id: vacancies.length + 1, title, company: "TechCorp Global", cat, loc, salary, desc });
+      renderVacancies();
+      logOut(`[NEW VACANCY] Position "${title}" posted by TechCorp.`);
+      alert(`Vacancy "${title}" published!`);
+    }
+
+    function viewReport() {
+      logOut(`[RECRUITMENT REPORT] Total active vacancies: ${vacancies.length} | Applications processed: ${applications.length} | Placement rate: 78.4%.`);
+      alert("Hiring analytics report generated.");
+    }
+
+    function filterJobs() {
+      const q = document.getElementById('jobKeyword').value.toLowerCase();
+      const cat = document.getElementById('jobCat').value;
+      const loc = document.getElementById('jobLoc').value;
+
+      const f = vacancies.filter(v => {
+        const title = (v.title || v.name).toLowerCase();
+        return (title.includes(q) || v.desc.toLowerCase().includes(q)) &&
+               (cat === 'All' || v.cat === cat) &&
+               (loc === 'All' || v.loc.includes(loc));
+      });
+      renderVacancies(f);
+    }
+
+    function toggleJobRole(r) {
+      ['seekerView', 'directorView', 'adminJobView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['btnS', 'btnD', 'btnA'].forEach(id => document.getElementById(id).className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700');
+
+      if (r === 'seeker') {
+        document.getElementById('seekerView').classList.remove('hidden');
+        document.getElementById('btnS').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      } else if (r === 'director') {
+        document.getElementById('directorView').classList.remove('hidden');
+        document.getElementById('btnD').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      } else {
+        document.getElementById('adminJobView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      }
+    }
+
+    renderVacancies();
+    renderApps();
+  </script>
+</body>
+</html>
