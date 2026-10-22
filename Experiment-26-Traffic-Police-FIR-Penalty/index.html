@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrafficSquad - FIR & Penalty Collection Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">👮‍♂️</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">TrafficSquad Police Portal</span>
+          <span class="ml-2 text-xs bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded-full border border-indigo-200">Exp 26: Traffic FIR</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTrafficRole('user')" id="btnU" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white">Vehicle Owner</button>
+        <button onclick="toggleTrafficRole('police')" id="btnP" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Traffic Officer</button>
+        <button onclick="toggleTrafficRole('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Commissioner Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VEHICLE OWNER VIEW -->
+  <main id="userTrafficView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-indigo-800 via-blue-900 to-slate-900 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-1">Verify e-Challan & Pay Traffic Penalties Online</h2>
+      <p class="text-indigo-200 text-xs mb-4">Transparent violation receipts with photographic evidence and digital payment receipt generator.</p>
+      
+      <div class="bg-white text-slate-800 p-4 rounded-xl flex flex-col sm:flex-row gap-3">
+        <input id="vehSearchInput" placeholder="Enter Vehicle Reg No (e.g. TN 07 CM 1024)" class="flex-1 border p-2 rounded-lg text-sm uppercase font-mono font-bold">
+        <button onclick="searchChallans()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-lg text-sm">Query Challans</button>
+      </div>
+    </div>
+
+    <!-- Challan Records -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Imposed Challans & Cases Filed</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Challan ID</th>
+              <th class="p-3">Vehicle #</th>
+              <th class="p-3">Violation Offense</th>
+              <th class="p-3">Photo Evidence</th>
+              <th class="p-3">Fine Amount</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Pay Penalty</th>
+            </tr>
+          </thead>
+          <tbody id="userChallansTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- POLICE OFFICER VIEW -->
+  <main id="policeView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-blue-900">Traffic Enforcement Squad Workstation</h3>
+        <p class="text-xs text-blue-700">Create e-Challan FIR with photo evidence, inspect penal code rules, and monitor live road feeds.</p>
+      </div>
+      <span class="text-xs bg-blue-200 text-blue-900 font-bold px-3 py-1 rounded-full">Officer: Sub-Inspector Rathore</span>
+    </div>
+
+    <!-- Create FIR Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">File New Traffic Violation Case (e-Challan)</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Vehicle Registration #</label>
+          <input id="newCaseVeh" value="TN 07 CM 1024" class="w-full border p-2 rounded-lg text-xs font-mono uppercase font-bold">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Violation Offense</label>
+          <select id="newCaseOffense" onchange="updateFineAmt()" class="w-full border p-2 rounded-lg text-xs">
+            <option value="1000">Red Light Jump (Sec 184) - Rs. 1000</option>
+            <option value="500">No Helmet / Seatbelt - Rs. 500</option>
+            <option value="2000">Over-Speeding (Sec 183) - Rs. 2000</option>
+            <option value="5000">Drunken Driving (Sec 185) - Rs. 5000</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Location Coordinates</label>
+          <input id="newCaseLoc" value="Anna Salai Junction, Camera Cam-04" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="flex items-end">
+          <button onclick="policeCreateCase()" class="w-full bg-rose-600 text-white font-bold py-2 rounded-lg text-xs">Issue e-Challan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Traffic Updates & Map Link -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-2">
+        <h4 class="font-bold text-slate-900">Live Traffic Corridor Feed</h4>
+        <div class="p-3 bg-slate-50 rounded-lg text-xs text-slate-700 space-y-1">
+          <p>• Heavy congestion reported on Mount Road towards Guindy.</p>
+          <p>• Flyover diversion active at Kathipara Junction.</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between">
+        <h4 class="font-bold text-slate-900">Google Map Live Traffic</h4>
+        <p class="text-xs text-slate-500">Live sensor feeds and camera integration active across 142 intersections.</p>
+        <button onclick="alert('Opening Google Maps Traffic Layer...')" class="bg-slate-800 text-white font-bold py-2 rounded-lg text-xs mt-2">Open Traffic Map Link</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminTrafficView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">Commissioner Office: Revenue & Enforcement Ledger</h3>
+        <p class="text-xs text-amber-700">Audit daily citation reports, manage police logins, and inspect fine collections.</p>
+      </div>
+      <button onclick="alert('Daily traffic report generated.')" class="bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-lg">View Daily Report</button>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Traffic Penalties Ledger</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX26</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[TRAFFICSQUAD] E-Challan Enforcement System Online.</div>
+        <div>[PHOTO-EVIDENCE] Automated camera snapshot link & fine collection engine active.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let challans = [
+      { id: "CH-9021", veh: "TN 07 CM 1024", offense: "Red Light Jump (Sec 184)", photo: "evidence_redlight_cam4.jpg", fine: 1000, status: "Unpaid" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderChallans() {
+      const tb = document.getElementById('userChallansTable');
+      tb.innerHTML = '';
+      challans.forEach(c => {
+        tb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-indigo-700">${c.id}</td>
+            <td class="p-3 font-mono font-bold">${c.veh}</td>
+            <td class="p-3">${c.offense}</td>
+            <td class="p-3 text-xs text-blue-600 font-mono underline cursor-pointer" onclick="alert('Viewing photo: ${c.photo}')">${c.photo}</td>
+            <td class="p-3 font-bold text-rose-600">Rs. ${c.fine}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${c.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${c.status}</span></td>
+            <td class="p-3 text-right">
+              ${c.status === 'Unpaid' ? `<button onclick="payChallan('${c.id}', ${c.fine})" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg">Pay Fine</button>` : `<button onclick="alert('Downloading Receipt for ${c.id}')" class="text-xs bg-slate-100 px-2 py-1 rounded">Receipt</button>`}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function payChallan(id, fine) {
+      const c = challans.find(x => x.id === id);
+      if (c) {
+        c.status = "Paid";
+        renderChallans();
+        logOut(`[PENALTY CLEARED] Challan ${id} fine of Rs. ${fine} paid successfully. Official receipt issued.`);
+        alert(`Payment of Rs. ${fine} successful! Challan cleared.`);
+      }
+    }
+
+    function policeCreateCase() {
+      const veh = document.getElementById('newCaseVeh').value;
+      const fine = parseInt(document.getElementById('newCaseOffense').value);
+      const offense = document.getElementById('newCaseOffense').selectedOptions[0].text.split('-')[0].trim();
+      const newId = "CH-" + Math.floor(1000 + Math.random() * 9000);
+
+      challans.push({ id: newId, veh, offense, photo: "speedcam_snapshot_" + newId + ".jpg", fine, status: "Unpaid" });
+      renderChallans();
+      logOut(`[NEW E-CHALLAN] ${newId} issued for ${veh} (${offense}). Fine: Rs. ${fine}. Notice dispatched.`);
+      alert(`e-Challan ${newId} issued for ${veh}!`);
+    }
+
+    function searchChallans() {
+      const v = document.getElementById('vehSearchInput').value.trim();
+      logOut(`[CHALLAN LOOKUP] Queried records for ${v}. Result: 1 active citation.`);
+    }
+
+    function toggleTrafficRole(r) {
+      ['userTrafficView', 'policeView', 'adminTrafficView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['btnU', 'btnP', 'btnA'].forEach(id => document.getElementById(id).className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700');
+
+      if (r === 'user') {
+        document.getElementById('userTrafficView').classList.remove('hidden');
+        document.getElementById('btnU').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      } else if (r === 'police') {
+        document.getElementById('policeView').classList.remove('hidden');
+        document.getElementById('btnP').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      } else {
+        document.getElementById('adminTrafficView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      }
+    }
+
+    renderChallans();
+  </script>
+</body>
+</html>

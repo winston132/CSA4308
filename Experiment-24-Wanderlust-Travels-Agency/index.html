@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wanderlust Travels - Tourism & Booking Agency</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">✈️</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">Wanderlust Travels</span>
+          <span class="ml-2 text-xs bg-sky-100 text-sky-800 font-semibold px-2 py-0.5 rounded-full border border-sky-200">Exp 24: Travel Agency</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTravelRole('user')" id="btnU" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white">Traveler</button>
+        <button onclick="toggleTravelRole('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Agency Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- USER VIEW -->
+  <main id="travelUserView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-sky-700 via-blue-800 to-indigo-900 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-1">Discover Curated Itineraries, Stays & Culinary Routes</h2>
+      <p class="text-sky-100 text-xs mb-4">View detailed food, hotel, and travel route packages and reserve accommodations.</p>
+    </div>
+
+    <!-- Tour Packages Grid -->
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Curated Vacation Packages</h3>
+      <div id="packagesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- My Booked Accommodations -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">My Booked Accommodations & Travel Itineraries</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Booking #</th>
+              <th class="p-3">Destination</th>
+              <th class="p-3">Hotel / Resort</th>
+              <th class="p-3">Culinary Plan</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Route Details</th>
+            </tr>
+          </thead>
+          <tbody id="userBookingsTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="travelAdminView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">Tourism Administrator Master Console</h3>
+        <p class="text-xs text-amber-700">Post tourism packages, manage food details, hotel details, route maps, and bookings.</p>
+      </div>
+      <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Agency Admin Active</span>
+    </div>
+
+    <!-- Post Package Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Post Tourism Package Details</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Destination Title</label>
+          <input id="newPkgTitle" value="Scenic Kodaikanal Pine Valley" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Hotel Stay</label>
+          <input id="newPkgHotel" value="Sterling Valley Resort (5-Star)" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Food / Cuisine</label>
+          <input id="newPkgFood" value="Organic Hill-Station Buffet" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Package Price (Rs)</label>
+          <input id="newPkgPrice" type="number" value="14500" class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="md:col-span-3">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Route & Transport</label>
+          <input id="newPkgRoute" value="Madurai Airport -> Ghat Road AC Coach -> Pine Forest." class="w-full border p-2 rounded-lg text-xs">
+        </div>
+        <div class="flex items-end">
+          <button onclick="adminAddPackage()" class="w-full bg-sky-600 text-white font-bold py-2 rounded-lg text-xs">Publish Package</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Wanderlust Global Agency Terminal</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX24</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[WANDERLUST] Travel Agency Engine Online. 3 Destinations active.</div>
+        <div>[INTEGRATION] Food, hotel accommodation, and transit routes mapped.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let packages = [
+      { id: 1, title: "Kerala Backwaters & Tea Trails", hotel: "Kumarakom Lake Luxury Resort", food: "Authentic Malabar Seafood & Vegetarian Sadhya", route: "Cochin Airport -> Houseboat Cruise -> Munnar Hills", price: 18500, icon: "🌴" },
+      { id: 2, title: "Golden Triangle Heritage Expedition", hotel: "Taj Rambagh Palace, Jaipur", food: "Royal Mughal & Rajasthani Thali", route: "Delhi -> Agra Express Highway -> Jaipur Forts", price: 24000, icon: "🏰" },
+      { id: 3, title: "Goa Sunset Beach Retreat", hotel: "Caravela Beachfront Spa Villa", food: "Goan Portuguese Fusion & Beach BBQ", route: "Mopa Airport -> Private Cab -> Calangute Coast", price: 12500, icon: "🏖️" }
+    ];
+
+    let myBookings = [
+      { id: "WL-401", title: "Kerala Backwaters", hotel: "Kumarakom Lake Resort", food: "Malabar Seafood Plan", status: "Confirmed", route: "Cochin -> Munnar" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderPackages() {
+      const g = document.getElementById('packagesGrid');
+      g.innerHTML = '';
+      packages.forEach(p => {
+        g.innerHTML += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="text-5xl mb-3 text-center">${p.icon}</div>
+              <h4 class="font-bold text-slate-900 text-base mb-1">${p.title}</h4>
+              <p class="text-xs text-slate-500 mb-2">🏨 Hotel: <span class="text-slate-800 font-medium">${p.hotel}</span></p>
+              <p class="text-xs text-slate-500 mb-2">🍽️ Food: <span class="text-slate-800 font-medium">${p.food}</span></p>
+              <p class="text-xs text-slate-500">🛣️ Route: <span class="text-slate-800 font-medium">${p.route}</span></p>
+            </div>
+            <div class="mt-4 pt-3 border-t flex justify-between items-center">
+              <span class="text-base font-extrabold text-sky-800">Rs. ${p.price.toLocaleString()}</span>
+              <button onclick="bookAccommodation('${p.title}', '${p.hotel}', '${p.food}')" class="bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg transition">Book Trip</button>
+            </div>
+          </div>
+        `;
+      });
+
+      const tb = document.getElementById('userBookingsTable');
+      tb.innerHTML = '';
+      myBookings.forEach(b => {
+        tb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-sky-700">${b.id}</td>
+            <td class="p-3 font-semibold">${b.title}</td>
+            <td class="p-3">${b.hotel}</td>
+            <td class="p-3 text-xs">${b.food}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${b.status}</span></td>
+            <td class="p-3 text-right"><button onclick="alert('Route: ${b.route}')" class="text-xs bg-slate-100 px-2 py-1 rounded">View Route</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function bookAccommodation(title, hotel, food) {
+      const newId = "WL-" + Math.floor(100 + Math.random() * 900);
+      myBookings.push({ id: newId, title, hotel, food, status: "Confirmed", route: "Guided Tour Map" });
+      renderPackages();
+      logOut(`[TRIP RESERVATION] ${newId} booked for ${title} at ${hotel}. Confirmation voucher emailed.`);
+      alert(`Trip ${newId} booked successfully!`);
+    }
+
+    function adminAddPackage() {
+      const title = document.getElementById('newPkgTitle').value;
+      const hotel = document.getElementById('newPkgHotel').value;
+      const food = document.getElementById('newPkgFood').value;
+      const price = parseFloat(document.getElementById('newPkgPrice').value);
+      const route = document.getElementById('newPkgRoute').value;
+
+      packages.push({ id: packages.length + 1, title, hotel, food, route, price, icon: "🌄" });
+      renderPackages();
+      logOut(`[TOURISM PACKAGE ADD] ${title} published at Rs. ${price}.`);
+      alert(`${title} published!`);
+    }
+
+    function toggleTravelRole(r) {
+      if (r === 'admin') {
+        document.getElementById('travelUserView').classList.add('hidden');
+        document.getElementById('travelAdminView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white';
+        document.getElementById('btnU').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      } else {
+        document.getElementById('travelAdminView').classList.add('hidden');
+        document.getElementById('travelUserView').classList.remove('hidden');
+        document.getElementById('btnU').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white';
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700';
+      }
+    }
+
+    renderPackages();
+  </script>
+</body>
+</html>

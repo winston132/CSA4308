@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifePulse - Blood Management Information System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-rose-50/30 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-rose-100 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🩸</span>
+        <div>
+          <span class="font-bold text-lg text-rose-950">LifePulse Blood Network</span>
+          <span class="ml-2 text-xs bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded-full border border-rose-200">Exp 23: Blood Bank</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleBloodRole('donor')" id="btnDon" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-600 text-white">Donor / User</button>
+        <button onclick="toggleBloodRole('hospital')" id="btnHosp" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Hospital Blood Bank</button>
+        <button onclick="toggleBloodRole('admin')" id="btnAdm" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- DONOR / USER VIEW -->
+  <main id="donorView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-red-700 via-rose-800 to-red-950 rounded-2xl p-6 text-white shadow-lg">
+      <h2 class="text-2xl font-bold mb-1">Search Blood Donors & Check Live Blood Bank Stock</h2>
+      <p class="text-rose-100 text-xs mb-4">Quick access to voluntary donors nationwide for emergency transfusions.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white text-slate-800 p-4 rounded-xl">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Required Blood Group</label>
+          <select id="srchGroup" onchange="filterDonors()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Blood Groups</option>
+            <option value="O+">O Positive (O+)</option>
+            <option value="O-">O Negative (O-)</option>
+            <option value="A+">A Positive (A+)</option>
+            <option value="B+">B Positive (B+)</option>
+            <option value="AB+">AB Positive (AB+)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">City / Region</label>
+          <select id="srchCity" onchange="filterDonors()" class="w-full border p-2 rounded-lg text-sm">
+            <option value="All">All Cities</option>
+            <option value="Chennai">Chennai</option>
+            <option value="Bangalore">Bangalore</option>
+          </select>
+        </div>
+        <div class="flex items-end md:col-span-2">
+          <button onclick="openModal('donorRegModal')" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 rounded-lg text-sm">+ Register as a Voluntary Blood Donor</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donors Directory -->
+    <div>
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Verified Blood Donors</h3>
+      <div id="donorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+  </main>
+
+  <!-- HOSPITAL VIEW -->
+  <main id="hospitalView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-blue-900">Hospital Blood Bank Storage & Inventory</h3>
+        <p class="text-xs text-blue-700">Update blood group units, inspect urgent hospital requests, and manage storage.</p>
+      </div>
+      <span class="text-xs bg-blue-200 text-blue-900 font-bold px-3 py-1 rounded-full">Apollo Central Blood Bank</span>
+    </div>
+
+    <!-- Blood Units Grid -->
+    <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-4">Current Stored Units (Click to Update Units)</h4>
+      <div id="bloodUnitsGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3"></div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">State Health Directorate - Blood Oversight</h3>
+        <p class="text-xs text-amber-700">Audit confidential medical reports, monitor donation drives, and ensure supply balance.</p>
+      </div>
+      <button onclick="alert('Medical audit report generated.')" class="bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-lg">Generate Medical Report</button>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-rose-100 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Nationwide Blood Stock Summary</h4>
+      <div class="p-4 bg-slate-50 rounded-xl text-xs text-slate-700 space-y-2">
+        <p>• Total Donors Registered: <b>14,820 Donors</b></p>
+        <p>• Emergency Transfusions Fulfilled: <b>98.7%</b></p>
+        <p>• Critical Need: <b>O Negative and AB Negative units in South Zone</b></p>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Blood Network Telemetry</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX23</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[LIFEPULSE] Blood Management Information System Online.</div>
+        <div>[INVENTORY-SYNC] 8 Blood Groups tracked across accredited hospitals.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Donor Registration Modal -->
+  <div id="donorRegModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-3 text-xs">
+      <h3 class="font-bold text-base text-slate-900">Volunteer Donor Registration</h3>
+      <div>
+        <label class="block text-slate-500 mb-1">Donor Full Name</label>
+        <input id="newDonName" value="Winston Yarraguntla" class="w-full border p-2 rounded-lg">
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-slate-500 mb-1">Blood Group</label>
+          <select id="newDonGroup" class="w-full border p-2 rounded-lg">
+            <option>O+</option><option>O-</option><option>A+</option><option>B+</option><option>AB+</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-500 mb-1">City</label>
+          <input id="newDonCity" value="Chennai" class="w-full border p-2 rounded-lg">
+        </div>
+      </div>
+      <div>
+        <label class="block text-slate-500 mb-1">Phone Number</label>
+        <input id="newDonPhone" value="+91 98401 23456" class="w-full border p-2 rounded-lg">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('donorRegModal')" class="px-4 py-2 border rounded-lg">Cancel</button>
+        <button onclick="registerDonor()" class="px-4 py-2 bg-rose-600 text-white font-bold rounded-lg">Register Donor</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let donors = [
+      { id: 1, name: "Karthik Subramanian", group: "O+", city: "Chennai", phone: "+91 94440 12345", lastDon: "4 months ago" },
+      { id: 2, name: "Divya Balaji", group: "O-", city: "Chennai", phone: "+91 98841 87654", lastDon: "6 months ago (Eligible)" },
+      { id: 3, name: "Suresh Raina", group: "B+", city: "Bangalore", phone: "+91 97100 45678", lastDon: "3 months ago" }
+    ];
+
+    let inventory = { "A+": 42, "A-": 8, "B+": 38, "B-": 12, "AB+": 18, "AB-": 4, "O+": 64, "O-": 6 };
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderDonors(list = donors) {
+      const g = document.getElementById('donorsGrid');
+      g.innerHTML = '';
+      list.forEach(d => {
+        g.innerHTML += `
+          <div class="bg-white rounded-2xl border border-rose-100 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="w-10 h-10 rounded-xl bg-rose-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">${d.group}</span>
+                <span class="text-xs bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded">Verified</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-base">${d.name}</h4>
+              <p class="text-xs text-slate-500 mt-0.5">Location: ${d.city}</p>
+              <p class="text-xs text-slate-500">Last Donation: ${d.lastDon}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t flex justify-between items-center">
+              <span class="font-mono text-xs font-bold text-slate-700">${d.phone}</span>
+              <button onclick="requestBlood('${d.name}', '${d.group}')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg">Contact</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderInventory() {
+      const g = document.getElementById('bloodUnitsGrid');
+      g.innerHTML = '';
+      Object.keys(inventory).forEach(grp => {
+        const units = inventory[grp];
+        g.innerHTML += `
+          <div onclick="editUnits('${grp}')" class="p-3 border rounded-xl text-center bg-slate-50 hover:bg-rose-50 cursor-pointer transition">
+            <span class="font-black text-rose-800 text-base block">${grp}</span>
+            <span class="font-bold text-sm text-slate-900">${units}</span>
+            <span class="text-slate-400 block text-[10px]">units</span>
+          </div>
+        `;
+      });
+    }
+
+    function requestBlood(name, grp) {
+      logOut(`[EMERGENCY CONTACT] Transfusion request dispatched to donor ${name} (${grp}).`);
+      alert(`Emergency SMS dispatched to ${name}!`);
+    }
+
+    function editUnits(grp) {
+      const u = prompt(`Update stored units for ${grp}:`, inventory[grp]);
+      if (u) {
+        inventory[grp] = parseInt(u);
+        renderInventory();
+        logOut(`[INVENTORY REVISED] ${grp} stock updated to ${u} units.`);
+      }
+    }
+
+    function registerDonor() {
+      const name = document.getElementById('newDonName').value;
+      const grp = document.getElementById('newDonGroup').value;
+      const city = document.getElementById('newDonCity').value;
+      const phone = document.getElementById('newDonPhone').value;
+
+      donors.push({ id: donors.length + 1, name, group: grp, city, phone, lastDon: "Eligible Now" });
+      renderDonors();
+      closeModal('donorRegModal');
+      logOut(`[DONOR REGISTERED] ${name} (${grp}, ${city}) joined LifePulse network.`);
+      alert(`Thank you ${name}! You are now registered.`);
+    }
+
+    function filterDonors() {
+      const grp = document.getElementById('srchGroup').value;
+      const city = document.getElementById('srchCity').value;
+      const f = donors.filter(d => (grp === 'All' || d.group === grp) && (city === 'All' || d.city === city));
+      renderDonors(f);
+    }
+
+    function toggleBloodRole(r) {
+      ['donorView', 'hospitalView', 'adminView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['btnDon', 'btnHosp', 'btnAdm'].forEach(id => document.getElementById(id).className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700');
+
+      if (r === 'donor') {
+        document.getElementById('donorView').classList.remove('hidden');
+        document.getElementById('btnDon').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-600 text-white';
+      } else if (r === 'hospital') {
+        document.getElementById('hospitalView').classList.remove('hidden');
+        document.getElementById('btnHosp').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-600 text-white';
+      } else {
+        document.getElementById('adminView').classList.remove('hidden');
+        document.getElementById('btnAdm').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-600 text-white';
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    renderDonors();
+    renderInventory();
+  </script>
+</body>
+</html>

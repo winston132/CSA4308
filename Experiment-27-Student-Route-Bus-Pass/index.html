@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartTransit - Public Route & Student Bus Pass Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🎫</span>
+        <div>
+          <span class="font-bold text-lg text-slate-900">SmartTransit Bus Pass</span>
+          <span class="ml-2 text-xs bg-indigo-100 text-indigo-800 font-semibold px-2 py-0.5 rounded-full border border-indigo-200">Exp 27: Transit Pass</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTransitRole('commuter')" id="btnC" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white">Student / Commuter</button>
+        <button onclick="toggleTransitRole('conductor')" id="btnCon" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Bus Conductor</button>
+        <button onclick="toggleTransitRole('admin')" id="btnA" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">Transit Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- COMMUTER VIEW -->
+  <main id="commuterView" class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-gradient-to-r from-indigo-800 via-blue-900 to-slate-900 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h2 class="text-2xl font-bold mb-1">Student Free Pass & Corporate Route Pass</h2>
+        <p class="text-indigo-200 text-xs">Govt. school free passes, monthly auto-renewal with eWallet, and QR bus boarding.</p>
+      </div>
+      <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-xl border border-white/20 text-center min-w-[180px]">
+        <span class="text-indigo-200 text-xs block">eWallet Balance</span>
+        <span class="font-bold text-white text-lg" id="transWalletBal">Rs. 450</span>
+        <button onclick="addTransitMoney()" class="mt-1 bg-indigo-500 text-white text-xs px-3 py-1 rounded font-bold">+ Add Money</button>
+      </div>
+    </div>
+
+    <!-- Pass Application & ETA Calculator -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+        <h4 class="font-bold text-slate-900">Apply New / Renewal Bus Pass</h4>
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="block text-slate-500 mb-1">Pass Category</label>
+            <select id="passTypeSelect" onchange="updatePassFee()" class="w-full border p-2 rounded-lg">
+              <option value="GovtStudent">Government Student Pass (100% Free)</option>
+              <option value="CollegeStudent">College Student Pass (Rs. 250 / mo)</option>
+              <option value="CorporateRoute">Corporate Route Pass (Rs. 600 / mo)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-500 mb-1">School / Company Details</label>
+            <input id="institutionName" value="Government Higher Secondary School, Adyar" class="w-full border p-2 rounded-lg">
+          </div>
+          <div>
+            <label class="block text-slate-500 mb-1">Route (From - To)</label>
+            <input id="passRoute" value="Adyar Depot to Central Station" class="w-full border p-2 rounded-lg">
+          </div>
+          <button onclick="applyTransitPass()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg">Submit Pass Application</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+        <h4 class="font-bold text-slate-900">Bus ETA Calculator</h4>
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="block text-slate-500 mb-1">Select Bus Route</label>
+            <select id="routeSelect" class="w-full border p-2 rounded-lg">
+              <option value="15">Route 21G: Broadway -> Tambaram (Next stop in 6 mins)</option>
+              <option value="25">Route 5C: T.Nagar -> High Court (Next stop in 12 mins)</option>
+            </select>
+          </div>
+          <button onclick="calculateEta()" class="w-full bg-slate-800 text-white font-bold py-2 rounded-lg">Calculate Expected Time to Reach (ETA)</button>
+          <div id="etaResult" class="hidden p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-indigo-900 font-bold text-center"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Passes with QR -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">My Bus Passes & Digital QR Codes</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">Pass ID</th>
+              <th class="p-3">Candidate</th>
+              <th class="p-3">Institution</th>
+              <th class="p-3">Type & Validity</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">QR Pass</th>
+            </tr>
+          </thead>
+          <tbody id="transitPassTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- CONDUCTOR VIEW -->
+  <main id="conductorView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-blue-900">Conductor Handheld Electronic Terminal</h3>
+        <p class="text-xs text-blue-700">Scan digital QR codes, verify student/route pass IDs, and broadcast live bus location.</p>
+      </div>
+      <span class="text-xs bg-blue-200 text-blue-900 font-bold px-3 py-1 rounded-full">Bus #21G - Conductor Doss</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+        <h4 class="font-bold text-slate-900">Scan Passenger Bus Pass QR</h4>
+        <div class="space-y-2 text-xs">
+          <input id="scanPassIdInput" placeholder="Enter or Scan Pass ID (e.g. BP-701)" class="w-full border p-2 rounded-lg font-mono">
+          <button onclick="conductorScan()" class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg">Validate Pass</button>
+        </div>
+        <div id="condScanResult" class="hidden p-3 bg-slate-50 border rounded-lg text-xs space-y-1"></div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+        <h4 class="font-bold text-slate-900">Update Live Bus Location & Stopping</h4>
+        <div class="space-y-2 text-xs">
+          <select id="busStopSelect" class="w-full border p-2 rounded-lg">
+            <option>Departed: Saidapet Junction</option>
+            <option>Arriving: Guindy Industrial Estate</option>
+            <option>Arriving: Airport Station</option>
+          </select>
+          <button onclick="alert('Live bus location broadcasted to passengers.')" class="w-full bg-slate-800 text-white font-bold py-2 rounded-lg">Broadcast Current Stop</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="adminTransitView" class="hidden max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-amber-900">State Transport Corporation Admin Console</h3>
+        <p class="text-xs text-amber-700">Approve bus passes, generate QR hashes, and create route stopping schedules.</p>
+      </div>
+      <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Admin Auth Verified</span>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h4 class="font-bold text-slate-900 mb-3">Pending Pass Applications (Approve & Generate QR)</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-3">App ID</th>
+              <th class="p-3">Applicant</th>
+              <th class="p-3">Category</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Approval</th>
+            </tr>
+          </thead>
+          <tbody id="adminTransitPassesTable" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- AREA OF OUTPUT -->
+  <div class="max-w-7xl mx-auto px-4 py-4 w-full">
+    <div class="bg-slate-900 text-slate-100 rounded-2xl p-5 shadow-xl border border-slate-800">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-300">Area of Output / Smart Transit Pass Terminal</h3>
+        </div>
+        <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Module: CSA4308-EX27</span>
+      </div>
+      <div id="outputArea" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl space-y-1 max-h-40 overflow-y-auto">
+        <div>[SMARTTRANSIT] Student & Route Bus Pass Management Engine Online.</div>
+        <div>[QR-RFID] Dynamic QR verification & eWallet auto-renewal protocol active.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let transitPasses = [
+      { id: "BP-701", name: "Winston Y.", inst: "Govt HSS Adyar", type: "Govt Student (Free)", validity: "30 Days Active", status: "Approved" }
+    ];
+
+    let pendingTransitPasses = [
+      { id: "APP-501", name: "Ananya Roy", inst: "Infosys IT Park", cat: "Corporate Route Pass", status: "Pending" }
+    ];
+
+    function logOut(msg) {
+      const area = document.getElementById('outputArea');
+      const div = document.createElement('div');
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    function renderPasses() {
+      const tb = document.getElementById('transitPassTable');
+      tb.innerHTML = '';
+      transitPasses.forEach(p => {
+        tb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold text-indigo-700">${p.id}</td>
+            <td class="p-3 font-semibold">${p.name}</td>
+            <td class="p-3">${p.inst}</td>
+            <td class="p-3 text-xs">${p.type}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">${p.status}</span></td>
+            <td class="p-3 text-right">
+              <button onclick="alert('Displaying Official Conductor QR Code for ${p.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg font-bold">Show QR</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      const atb = document.getElementById('adminTransitPassesTable');
+      atb.innerHTML = '';
+      pendingTransitPasses.forEach(a => {
+        atb.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono font-bold">${a.id}</td>
+            <td class="p-3 font-semibold">${a.name}</td>
+            <td class="p-3">${a.cat}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">${a.status}</span></td>
+            <td class="p-3 text-right">
+              <button onclick="adminApproveTransit('${a.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded">Approve Pass</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function applyTransitPass() {
+      const type = document.getElementById('passTypeSelect').value;
+      const inst = document.getElementById('institutionName').value;
+      const newId = "APP-" + Math.floor(100 + Math.random() * 900);
+
+      pendingTransitPasses.push({ id: newId, name: "Winston Y.", inst, cat: type, status: "Pending" });
+      renderPasses();
+      logOut(`[PASS APPLIED] Application ${newId} submitted for ${type}. Transport Corporation alerted.`);
+      alert(`Pass Application ${newId} submitted!`);
+    }
+
+    function adminApproveTransit(id) {
+      const a = pendingTransitPasses.find(x => x.id === id);
+      if (a) {
+        pendingTransitPasses = pendingTransitPasses.filter(x => x.id !== id);
+        const passId = "BP-" + Math.floor(100 + Math.random() * 900);
+        transitPasses.push({ id: passId, name: a.name, inst: a.inst || "Verified Institution", type: a.cat, validity: "30 Days Active", status: "Approved" });
+        renderPasses();
+        logOut(`[ADMIN APPROVAL] Pass application ${id} approved. Issued QR Pass: ${passId}.`);
+        alert(`Pass ${passId} approved!`);
+      }
+    }
+
+    function conductorScan() {
+      const id = document.getElementById('scanPassIdInput').value.trim();
+      const p = transitPasses.find(x => x.id.toLowerCase() === id.toLowerCase());
+      const res = document.getElementById('condScanResult');
+      res.classList.remove('hidden');
+
+      if (p) {
+        res.innerHTML = `
+          <div class="text-emerald-700 font-bold">✅ VALID BUS PASS - ENTRY AUTHORIZED</div>
+          <div>Holder: ${p.name} | Category: ${p.type}</div>
+          <div>Validity: ${p.validity}</div>
+        `;
+        logOut(`[CONDUCTOR VERIFY] Pass ${p.id} verified for passenger ${p.name}. Boarding approved.`);
+      } else {
+        res.innerHTML = `<div class="text-rose-600 font-bold">❌ INVALID OR EXPIRED PASS</div>`;
+        logOut(`[CONDUCTOR VERIFY] Validation rejected for: ${id}.`);
+      }
+    }
+
+    function calculateEta() {
+      const m = document.getElementById('routeSelect').value;
+      const res = document.getElementById('etaResult');
+      res.classList.remove('hidden');
+      res.textContent = `Estimated Time of Arrival (ETA): ${m} minutes based on real-time traffic.`;
+      logOut(`[ETA CALCULATION] Estimated arrival time calculated: ${m} minutes.`);
+    }
+
+    function addTransitMoney() {
+      const amt = prompt("Enter amount to add to transit wallet (Rs):", "300");
+      if (amt) {
+        document.getElementById('transWalletBal').textContent = "Rs. " + (450 + parseInt(amt));
+        logOut(`[EWALLET RELOAD] Rs. ${amt} credited for monthly pass renewal.`);
+      }
+    }
+
+    function updatePassFee() {}
+
+    function toggleTransitRole(r) {
+      ['commuterView', 'conductorView', 'adminTransitView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['btnC', 'btnCon', 'btnA'].forEach(id => document.getElementById(id).className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700');
+
+      if (r === 'commuter') {
+        document.getElementById('commuterView').classList.remove('hidden');
+        document.getElementById('btnC').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      } else if (r === 'conductor') {
+        document.getElementById('conductorView').classList.remove('hidden');
+        document.getElementById('btnCon').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      } else {
+        document.getElementById('adminTransitView').classList.remove('hidden');
+        document.getElementById('btnA').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white';
+      }
+    }
+
+    renderPasses();
+  </script>
+</body>
+</html>
