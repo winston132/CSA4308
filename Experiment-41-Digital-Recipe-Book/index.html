@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culina | Digital Interactive Recipe Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ea580c;
+            --primary-dark: #c2410c;
+            --bg: #fff7ed;
+            --surface: #ffffff;
+            --border: #fed7aa;
+            --text-dark: #431407;
+            --text-muted: #7c2d12;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafaf9; color: #1c1917; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+        header { background: #431407; color: #ffedd5; padding: 18px 0; border-bottom: 3px solid var(--primary); }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: 800; color: #fdba74; }
+
+        .recipe-header { background: var(--surface); border: 1px solid #e7e5e4; border-radius: 14px; padding: 32px; margin: 30px 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); }
+        .recipe-title { font-size: 32px; font-weight: 800; color: #431407; margin-bottom: 8px; }
+        .meta-chips { display: flex; gap: 16px; font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+        .servings-box { display: flex; align-items: center; gap: 12px; background: #fff7ed; border: 1px solid var(--border); padding: 10px 18px; border-radius: 30px; width: fit-content; }
+        .serving-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--primary); background: #fff; font-weight: bold; cursor: pointer; color: var(--primary); }
+
+        .recipe-body { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; margin-bottom: 50px; }
+        .card { background: var(--surface); border: 1px solid #e7e5e4; border-radius: 14px; padding: 24px; }
+        .card h3 { font-size: 19px; margin-bottom: 16px; color: #431407; border-bottom: 2px solid #fed7aa; padding-bottom: 8px; }
+
+        .ingredient-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f5f5f4; font-size: 14px; }
+        .ingredient-item input[type="checkbox"] { accent-color: var(--primary); width: 16px; height: 16px; }
+
+        .step-item { display: flex; gap: 14px; margin-bottom: 20px; }
+        .step-num { min-width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .step-text { font-size: 14px; line-height: 1.6; color: #292524; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="logo">CULINA <span>DIGITAL RECIPES</span></div>
+            <button onclick="window.print()" style="background:var(--primary); color:#fff; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer;">🖨️ Print Recipe</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="recipe-header">
+            <h1 class="recipe-title">Authentic Tuscan Wild Mushroom Risotto</h1>
+            <div class="meta-chips">
+                <span>⏱️ Prep: 15 mins</span>
+                <span>🔥 Cook: 30 mins</span>
+                <span>⭐ 4.95 (380 reviews)</span>
+                <span>🌱 Vegetarian Friendly</span>
+            </div>
+            <div class="servings-box">
+                <span style="font-weight:600; font-size:13px;">Adjust Servings:</span>
+                <button class="serving-btn" onclick="updateServings(-1)">-</button>
+                <span id="servCount" style="font-weight:700; min-width:20px; text-align:center;">4</span>
+                <button class="serving-btn" onclick="updateServings(1)">+</button>
+            </div>
+        </div>
+
+        <div class="recipe-body">
+            <!-- Ingredients with Scaler -->
+            <div class="card">
+                <h3>Ingredients Checklist</h3>
+                <div id="ingredientList">
+                    <div class="ingredient-item"><input type="checkbox"> <span class="ing-qty" data-base="300">300</span>g Arborio Carnaroli Rice</div>
+                    <div class="ingredient-item"><input type="checkbox"> <span class="ing-qty" data-base="250">250</span>g Fresh Porcini & Cremini Mushrooms</div>
+                    <div class="ingredient-item"><input type="checkbox"> <span class="ing-qty" data-base="1000">1000</span>ml Simmering Vegetable Stock</div>
+                    <div class="ingredient-item"><input type="checkbox"> <span class="ing-qty" data-base="120">120</span>ml Dry White Italian Wine</div>
+                    <div class="ingredient-item"><input type="checkbox"> <span class="ing-qty" data-base="60">60</span>g Grated Parmigiano-Reggiano</div>
+                    <div class="ingredient-item"><input type="checkbox"> <span class="ing-qty" data-base="40">40</span>g Unsalted Cold Butter</div>
+                </div>
+            </div>
+
+            <!-- Cooking Instructions -->
+            <div class="card">
+                <h3>Step-by-Step Cooking Guide</h3>
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-text"><strong>Sauté the Mushrooms:</strong> Heat 1 tbsp olive oil in a heavy-bottomed skillet over medium-high heat. Sauté sliced mushrooms until deeply golden. Reserve half for garnish.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-text"><strong>Toast the Rice:</strong> In a wide saucepan, sweat finely chopped shallots in butter. Add the Arborio rice and toast for 2 minutes until translucent around the edges.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-text"><strong>Deglaze & Simmer:</strong> Pour in the dry white wine, stirring continuously until absorbed. Begin ladling hot vegetable stock one scoop at a time, allowing each ladle to absorb before adding the next.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-text"><strong>Mantecatura Finish:</strong> Remove from heat. Vigorously beat in cold cubed butter and freshly grated Parmigiano-Reggiano to create a velvety emulsion. Serve immediately with cracked pepper.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let curServ = 4;
+        function updateServings(delta) {
+            let next = curServ + delta;
+            if(next < 1 || next > 12) return;
+            curServ = next;
+            document.getElementById('servCount').innerText = curServ;
+            const elements = document.querySelectorAll('.ing-qty');
+            elements.forEach(el => {
+                const base = parseFloat(el.getAttribute('data-base'));
+                const scaled = Math.round((base / 4) * curServ);
+                el.innerText = scaled;
+            });
+        }
+    </script>
+</body>
+</html>

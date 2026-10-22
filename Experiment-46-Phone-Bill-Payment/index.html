@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TelecomPay | Monthly Phone Bill Payment & Penalty Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-dark); }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+        header { background: #0f172a; color: #fff; padding: 18px 0; border-bottom: 3px solid var(--primary); }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 22px; font-weight: 800; color: #60a5fa; }
+
+        .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin: 36px 0; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04); }
+        .card h2 { font-size: 20px; margin-bottom: 16px; color: var(--primary-dark); }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; }
+
+        .bill-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+        .bill-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #93c5fd; }
+        .bill-total { display: flex; justify-content: space-between; padding: 10px 0 0; font-weight: 800; font-size: 16px; color: #1d4ed8; }
+        .btn-pay { background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="logo">TELECOMPAY <span>MONTHLY PORTAL</span></div>
+            <span style="font-size:13px; color:#cbd5e1;">Postpaid Billing & Penalty Settlement</span>
+        </div>
+    </header>
+
+    <div class="container layout">
+        <!-- Account Overview & Payment Amount -->
+        <div class="card">
+            <h2>Postpaid Customer Account</h2>
+            <form onsubmit="handlePay(event)">
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="tel" id="pNum" required value="+91 98450 12890">
+                </div>
+                <div class="form-group">
+                    <label>Postpaid Plan</label>
+                    <select id="pPlan" onchange="updateBill()">
+                        <option value="699">Infinity Pro 5G Unlimited (₹699/mo)</option>
+                        <option value="999">Family Multi-SIM 5G (₹999/mo)</option>
+                        <option value="1499">Enterprise Global Roaming (₹1,499/mo)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Days Overdue (Late Fine: ₹10/day added after due date)</label>
+                    <input type="number" id="pOverdue" required value="4" min="0" oninput="updateBill()">
+                </div>
+                <div class="form-group">
+                    <label>Payment Preference</label>
+                    <select id="pMode" onchange="toggleCustomAmount()">
+                        <option value="full">Pay Entire Outstanding Amount</option>
+                        <option value="custom">Pay Custom Partial Amount</option>
+                    </select>
+                </div>
+                <div class="form-group" id="customBox" style="display:none;">
+                    <label>Enter Custom Amount to Pay (₹)</label>
+                    <input type="number" id="customAmt" value="500">
+                </div>
+                <button type="submit" class="btn-pay">Authorize & Pay Phone Bill</button>
+            </form>
+        </div>
+
+        <!-- Bill Invoice Breakdown -->
+        <div class="card">
+            <h2>Current Monthly Invoice</h2>
+            <div class="bill-box">
+                <div class="bill-row"><span>Billing Cycle:</span><span>01 Apr 2026 - 30 Apr 2026</span></div>
+                <div class="bill-row"><span>Due Date:</span><span>15 May 2026</span></div>
+                <div class="bill-row"><span>Monthly Plan Rental:</span><span id="dPlan">₹699.00</span></div>
+                <div class="bill-row"><span>18% Telecom GST:</span><span id="dGst">₹125.82</span></div>
+                <div class="bill-row"><span>Late Fine (4 days × ₹10):</span><span id="dFine">₹40.00</span></div>
+                <div class="bill-total"><span>TOTAL OUTSTANDING:</span><span id="dTotal">₹864.82</span></div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer;">
+                    <input type="checkbox" checked> Enable Auto-Pay for upcoming monthly cycles
+                </label>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Instant digital receipt with tax invoice emailed to user upon transaction.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCustomAmount() {
+            const mode = document.getElementById('pMode').value;
+            document.getElementById('customBox').style.display = mode === 'custom' ? 'block' : 'none';
+        }
+
+        function updateBill() {
+            const plan = parseFloat(document.getElementById('pPlan').value) || 0;
+            const days = parseInt(document.getElementById('pOverdue').value) || 0;
+            const gst = plan * 0.18;
+            const fine = days * 10;
+            const total = plan + gst + fine;
+
+            document.getElementById('dPlan').innerText = '₹' + plan.toFixed(2);
+            document.getElementById('dGst').innerText = '₹' + gst.toFixed(2);
+            document.getElementById('dFine').innerText = '₹' + fine.toFixed(2) + ' (' + days + ' days × ₹10)';
+            document.getElementById('dTotal').innerText = '₹' + total.toFixed(2);
+        }
+
+        function handlePay(e) {
+            e.preventDefault();
+            const mode = document.getElementById('pMode').value;
+            let amt = document.getElementById('dTotal').innerText;
+            if(mode === 'custom') amt = '₹' + document.getElementById('customAmt').value;
+            alert('Payment of ' + amt + ' processed successfully! Digital receipt emailed.');
+        }
+
+        updateBill();
+    </script>
+</body>
+</html>

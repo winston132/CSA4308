@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentTrack | Online Campus Placement Assessment Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --success: #16a34a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-dark); }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+        header { background: #0f172a; color: #fff; padding: 18px 0; border-bottom: 3px solid var(--primary); }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 22px; font-weight: 800; color: #a5b4fc; }
+
+        .dashboard { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin: 30px 0; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04); }
+        .card h2 { font-size: 19px; margin-bottom: 16px; color: var(--primary-dark); }
+
+        .timer-badge { background: #fee2e2; color: #b91c1c; font-weight: 700; padding: 6px 14px; border-radius: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+        .q-box { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px; }
+        .q-box:last-child { border-bottom: none; }
+        .q-title { font-weight: 600; font-size: 14px; margin-bottom: 10px; }
+        .option-label { display: block; font-size: 13px; margin-bottom: 6px; cursor: pointer; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+        th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f1f5f9; color: #334155; }
+        .btn-action { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="brand">TALENTTRACK <span>ASSESSMENT</span></div>
+            <div style="font-size:13px; color:#cbd5e1;">Candidate: Rahul Sharma (Reg: 22BCS1084)</div>
+        </div>
+    </header>
+
+    <div class="container dashboard">
+        <!-- Live Assessment Section -->
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h2>Campus Drive 2026: Technical Aptitude & Data Structures</h2>
+                <span class="timer-badge">⏳ Time Left: 24:18</span>
+            </div>
+
+            <form onsubmit="submitExam(event)">
+                <div class="q-box">
+                    <div class="q-title">Q1. What is the average time complexity of searching in a Balanced AVL Binary Search Tree with N nodes?</div>
+                    <label class="option-label"><input type="radio" name="q1" value="a"> A) O(1)</label>
+                    <label class="option-label"><input type="radio" name="q1" value="b" checked> B) O(log N)</label>
+                    <label class="option-label"><input type="radio" name="q1" value="c"> C) O(N)</label>
+                    <label class="option-label"><input type="radio" name="q1" value="d"> D) O(N log N)</label>
+                </div>
+
+                <div class="q-box">
+                    <div class="q-title">Q2. Which graph traversal algorithm is strictly used to compute single-source shortest paths in an unweighted graph?</div>
+                    <label class="option-label"><input type="radio" name="q2" value="a" checked> A) Breadth First Search (BFS)</label>
+                    <label class="option-label"><input type="radio" name="q2" value="b"> B) Depth First Search (DFS)</label>
+                    <label class="option-label"><input type="radio" name="q2" value="c"> C) Prim's Algorithm</label>
+                    <label class="option-label"><input type="radio" name="q2" value="d"> D) Kruskal's Algorithm</label>
+                </div>
+
+                <div class="q-box">
+                    <div class="q-title">Q3. In relational database transactions, which ACID property ensures all operations succeed or all are rolled back?</div>
+                    <label class="option-label"><input type="radio" name="q3" value="a" checked> A) Atomicity</label>
+                    <label class="option-label"><input type="radio" name="q3" value="b"> B) Consistency</label>
+                    <label class="option-label"><input type="radio" name="q3" value="c"> C) Isolation</label>
+                    <label class="option-label"><input type="radio" name="q3" value="d"> D) Durability</label>
+                </div>
+
+                <button type="submit" class="btn-action" style="background:var(--success);">Submit Exam & Auto-Grade</button>
+            </form>
+        </div>
+
+        <!-- Leaderboard & Scorecard -->
+        <div>
+            <div class="card" style="margin-bottom:20px;">
+                <h2>Merit Rank List (Published)</h2>
+                <table>
+                    <thead><tr><th>Rank</th><th>Candidate</th><th>Score</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td>🥇 1</td><td>Priya Venkat</td><td>98/100</td><td><span style="color:green;font-weight:600;">Shortlisted</span></td></tr>
+                        <tr><td>🥈 2</td><td>Rahul Sharma</td><td>94/100</td><td><span style="color:green;font-weight:600;">Shortlisted</span></td></tr>
+                        <tr><td>🥉 3</td><td>Aman Gupta</td><td>91/100</td><td><span style="color:green;font-weight:600;">Shortlisted</span></td></tr>
+                        <tr><td>4</td><td>Sneha Reddy</td><td>86/100</td><td><span style="color:green;font-weight:600;">Shortlisted</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Candidate Scorecard</h2>
+                <div style="font-size:13px; line-height:1.8; color:var(--text-muted); margin-bottom:14px;">
+                    Candidate: <strong>Rahul Sharma</strong><br>
+                    Exam: CS Technical Placement Test<br>
+                    Percentile: <strong>96.4%</strong><br>
+                    Grade: <strong>Distinction (A+)</strong>
+                </div>
+                <button class="btn-action" onclick="alert('Downloading Certified Placement Scorecard PDF...')">Download Scorecard</button>
+                <button class="btn-action" style="background:none; color:var(--text-muted); border:1px solid var(--border); margin-top:8px;" onclick="alert('Re-evaluation request submitted to Academic Review Committee.')">Apply for Re-evaluation</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function submitExam(e) {
+            e.preventDefault();
+            alert('Exam submitted successfully! Auto-grading result: 3/3 correct (100%). Your profile has been updated on the company interview shortlist.');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerPay | Electricity Bill Payment & Slab Tariff Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-dark); }
+        .container { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+
+        header { background: #0f172a; color: #fff; padding: 18px 0; border-bottom: 3px solid var(--primary); }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 22px; font-weight: 800; color: #38bdf8; }
+
+        .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin: 36px 0; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04); }
+        .card h2 { font-size: 20px; margin-bottom: 16px; color: var(--primary-dark); }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; }
+
+        /* Calculation Breakdown Box */
+        .bill-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+        .bill-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #86efac; }
+        .bill-total { display: flex; justify-content: space-between; padding: 10px 0 0; font-weight: 800; font-size: 16px; color: #15803d; }
+        .btn-pay { background: #16a34a; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 16px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="brand">POWERPAY <span>ELECTRICITY BILLING</span></div>
+            <span style="font-size:13px; color:#94a3b8;">Bi-Monthly Consumer Tariff System</span>
+        </div>
+    </header>
+
+    <div class="container layout">
+        <!-- Consumer Calculation Input -->
+        <div class="card">
+            <h2>Consumer Bill Calculator</h2>
+            <form onsubmit="calculateEB(event)">
+                <div class="form-group">
+                    <label>Consumer Service Connection Number</label>
+                    <input type="text" id="ebNo" required value="EB-DOM-89214">
+                </div>
+                <div class="form-group">
+                    <label>EB Connection Type</label>
+                    <select id="ebType" onchange="calculateEB(event)">
+                        <option value="domestic">Domestic (Household Tariff)</option>
+                        <option value="commercial">Commercial (Enterprise Tariff)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Units Consumed in Bi-Monthly Billing Cycle</label>
+                    <input type="number" id="ebUnits" required value="320" min="0" oninput="calculateEB(event)">
+                </div>
+                <div class="form-group">
+                    <label>Days Elapsed After Due Date (Late Fine: ₹10/day)</label>
+                    <input type="number" id="ebDaysLate" required value="3" min="0" oninput="calculateEB(event)">
+                </div>
+                <button type="submit" class="btn-pay" style="background:var(--primary);">Recalculate Bill</button>
+            </form>
+        </div>
+
+        <!-- Official Tariff Breakdown & Payment -->
+        <div class="card">
+            <h2>Official Bill Invoice & Slabs</h2>
+            <div class="bill-box">
+                <div class="bill-row"><span>Billing Period:</span><span>01 Feb 2026 - 31 Mar 2026</span></div>
+                <div class="bill-row"><span>Connection Type:</span><span id="dispType">Domestic</span></div>
+                <div class="bill-row"><span>Consumed Units:</span><span id="dispUnits">320 Units</span></div>
+                <div class="bill-row"><span>Energy Charges:</span><span id="dispBase">₹830.00</span></div>
+                <div class="bill-row"><span>Late Payment Fine (₹10/day):</span><span id="dispFine">₹30.00</span></div>
+                <div class="bill-total"><span>TOTAL PAYABLE:</span><span id="dispTotal">₹860.00</span></div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Select Payment Gateway:</label>
+                <select class="form-group" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px;">
+                    <option>Instant UPI (GooglePay / PhonePe / Paytm)</option>
+                    <option>Credit / Debit Card (Visa, RuPay, MasterCard)</option>
+                    <option>Net Banking (SBI, HDFC, ICICI, Axis)</option>
+                </select>
+                <button class="btn-pay" onclick="payBill()">Complete Online Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateEB(e) {
+            if(e && e.preventDefault) e.preventDefault();
+            const type = document.getElementById('ebType').value;
+            const units = parseFloat(document.getElementById('ebUnits').value) || 0;
+            const daysLate = parseInt(document.getElementById('ebDaysLate').value) || 0;
+
+            let base = 0;
+            if(type === 'domestic') {
+                if(units <= 100) base = units * 1.00;
+                else if(units <= 200) base = (100 * 1.00) + ((units - 100) * 2.50);
+                else if(units <= 500) base = (100 * 1.00) + (100 * 2.50) + ((units - 200) * 4.00);
+                else base = (100 * 1.00) + (100 * 2.50) + (300 * 4.00) + ((units - 500) * 6.00);
+            } else {
+                if(units <= 100) base = units * 2.00;
+                else if(units <= 200) base = (100 * 2.00) + ((units - 100) * 4.50);
+                else if(units <= 500) base = (100 * 2.00) + (100 * 4.50) + ((units - 200) * 6.00);
+                else base = (100 * 2.00) + (100 * 4.50) + (300 * 6.00) + ((units - 500) * 7.00);
+            }
+
+            const fine = daysLate * 10;
+            const total = base + fine;
+
+            document.getElementById('dispType').innerText = type.charAt(0).toUpperCase() + type.slice(1);
+            document.getElementById('dispUnits').innerText = units + ' Units';
+            document.getElementById('dispBase').innerText = '₹' + base.toFixed(2);
+            document.getElementById('dispFine').innerText = '₹' + fine.toFixed(2);
+            document.getElementById('dispTotal').innerText = '₹' + total.toFixed(2);
+        }
+
+        function payBill() {
+            const tot = document.getElementById('dispTotal').innerText;
+            alert('Transaction Successful! Payment of ' + tot + ' received. Digital receipt generated and sent to registered mobile.');
+        }
+
+        // Initialize calculation on load
+        calculateEB();
+    </script>
+</body>
+</html>

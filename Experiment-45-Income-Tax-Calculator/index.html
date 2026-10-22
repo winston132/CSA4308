@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaxCalc Pro | Government Slabs Income Tax Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #047857;
+            --primary-dark: #065f46;
+            --bg: #f0fdf4;
+            --surface: #ffffff;
+            --text-dark: #064e3b;
+            --text-muted: #047857;
+            --border: #a7f3d0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: #0f172a; }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+        header { background: #064e3b; color: #ecfdf5; padding: 18px 0; border-bottom: 3px solid #10b981; }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 22px; font-weight: 800; color: #6ee7b7; }
+
+        .layout { display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; margin: 36px 0; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04); }
+        .card h2 { font-size: 20px; margin-bottom: 16px; color: var(--primary-dark); }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+
+        .calc-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+        .calc-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #cbd5e1; }
+        .calc-total { display: flex; justify-content: space-between; padding: 10px 0 0; font-weight: 800; font-size: 16px; color: #047857; }
+        .btn-calc { background: var(--primary); color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="brand">TAXCALC <span>GOVERNMENT SLABS</span></div>
+            <span style="font-size:13px; color:#a7f3d0;">Assessment Year 2026-2027</span>
+        </div>
+    </header>
+
+    <div class="container layout">
+        <!-- Input Form -->
+        <div class="card">
+            <h2>Employee Monthly Salary & Deductions</h2>
+            <form onsubmit="computeTax(event)">
+                <div class="form-group">
+                    <label>Monthly Gross Pay (₹)</label>
+                    <input type="number" id="gross" required value="95000" oninput="computeTax(event)">
+                </div>
+                <div class="form-group">
+                    <label>Monthly House Rent Allowance (HRA) (₹)</label>
+                    <input type="number" id="hra" required value="18000" oninput="computeTax(event)">
+                </div>
+                <div class="form-group">
+                    <label>Monthly Pension / EPF Contribution (₹) (Max ₹1.5L/yr)</label>
+                    <input type="number" id="pension" required value="12500" oninput="computeTax(event)">
+                </div>
+                <div class="form-group">
+                    <label>Monthly Health Insurance Premium (₹)</label>
+                    <input type="number" id="health" required value="2500" oninput="computeTax(event)">
+                </div>
+                <div style="font-size:12px; color:#64748b; margin-top:4px;">* Standard Deduction of ₹50,000 is automatically applied per norms.</div>
+                <button type="submit" class="btn-calc">Recalculate Income Tax</button>
+            </form>
+        </div>
+
+        <!-- Breakdown & Slab Calculation -->
+        <div class="card">
+            <h2>Tax Breakdown & Government Slabs</h2>
+            <div class="calc-box">
+                <div class="calc-row"><span>Annual Gross (Gross × 12):</span><span id="dAnnualGross">₹1,140,000</span></div>
+                <div class="calc-row"><span>Total Deductions:</span><span id="dTotalDed">₹476,000</span></div>
+                <div class="calc-row"><span>Standard Deduction:</span><span>₹50,000</span></div>
+                <div class="calc-row"><span><strong>Net Taxable Income:</strong></span><span id="dNetTaxable" style="font-weight:bold;">₹614,000</span></div>
+                <div class="calc-row"><span>Slab 0 - 2.5L (0%):</span><span>₹0</span></div>
+                <div class="calc-row"><span>Slab 2.5L - 5L (5%):</span><span>₹12,500</span></div>
+                <div class="calc-row"><span>Slab 5L - 10L (20%):</span><span id="dSlab20">₹22,800</span></div>
+                <div class="calc-total"><span>TOTAL TAX LIABILITY:</span><span id="dTotalTax">₹35,300</span></div>
+            </div>
+
+            <button class="btn-calc" style="background:#064e3b; margin-top:20px;" onclick="alert('Downloading Certified IT Return Computation Sheet (Form 16 Summary)...')">Download Form 16 Tax Summary</button>
+        </div>
+    </div>
+
+    <script>
+        function computeTax(e) {
+            if(e && e.preventDefault) e.preventDefault();
+            const gross = parseFloat(document.getElementById('gross').value) || 0;
+            const hra = parseFloat(document.getElementById('hra').value) || 0;
+            const pension = parseFloat(document.getElementById('pension').value) || 0;
+            const health = parseFloat(document.getElementById('health').value) || 0;
+
+            const annualGross = gross * 12;
+            const annualHra = hra * 12;
+            const stdDed = 50000;
+            const annualPensionDed = Math.min(pension * 12, 150000);
+            const annualHealth = health * 12;
+
+            const totalDed = annualHra + stdDed + annualPensionDed + annualHealth;
+            const netTaxable = Math.max(0, annualGross - totalDed);
+
+            let tax = 0;
+            let slab20 = 0;
+
+            if(netTaxable <= 500000) {
+                tax = 0; // Nil rebate
+            } else {
+                if(netTaxable <= 500000) {
+                    tax = (netTaxable - 250000) * 0.05;
+                } else if(netTaxable <= 1000000) {
+                    slab20 = (netTaxable - 500000) * 0.20;
+                    tax = 12500 + slab20;
+                } else {
+                    slab20 = 100000;
+                    const slab30 = (netTaxable - 1000000) * 0.30;
+                    tax = 112500 + slab30;
+                }
+            }
+
+            document.getElementById('dAnnualGross').innerText = '₹' + annualGross.toLocaleString('en-IN');
+            document.getElementById('dTotalDed').innerText = '₹' + totalDed.toLocaleString('en-IN');
+            document.getElementById('dNetTaxable').innerText = '₹' + netTaxable.toLocaleString('en-IN');
+            document.getElementById('dSlab20').innerText = '₹' + slab20.toLocaleString('en-IN');
+            document.getElementById('dTotalTax').innerText = '₹' + tax.toLocaleString('en-IN');
+        }
+
+        // Run initial compute
+        computeTax();
+    </script>
+</body>
+</html>

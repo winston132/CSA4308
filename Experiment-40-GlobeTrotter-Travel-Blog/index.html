@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobeTrotter | Global Travel Chronicles & Itineraries</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --accent: #f59e0b;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-dark); }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+        header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 0; }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary); }
+
+        .hero { background: linear-gradient(rgba(15,118,110,0.85), rgba(13,148,136,0.85)), #0f766e; color: #fff; padding: 70px 0; text-align: center; }
+        .hero h1 { font-size: 46px; margin-bottom: 12px; }
+        .hero p { font-size: 17px; color: #ccfbf1; max-width: 600px; margin: 0 auto; }
+
+        .blog-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin: 40px 0 60px; }
+        .post-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 24px; }
+        .post-img { height: 220px; background: #0d9488; display: flex; align-items: center; justify-content: center; font-size: 54px; color: #fff; }
+        .post-body { padding: 24px; }
+        .post-meta { font-size: 12px; color: var(--primary); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .post-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; color: #0f172a; }
+        .post-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+
+        .side-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .side-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--primary-dark); border-bottom: 2px solid #ccfbf1; padding-bottom: 6px; }
+        .tag-pill { display: inline-block; padding: 4px 10px; background: #f1f5f9; border-radius: 14px; font-size: 12px; margin: 4px; color: #334155; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="logo">GLOBE<span>TROTTER</span></div>
+            <div style="font-size:13px; font-weight:600; color:var(--text-muted);">Solo & Expedition Travel Journal</div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container">
+            <h1 class="serif">Journeys Beyond the Horizon</h1>
+            <p class="serif">Personal narratives, photographic dispatches, and logistical field notes from 42 countries across six continents.</p>
+        </div>
+    </div>
+
+    <div class="container blog-grid">
+        <main>
+            <article class="post-card">
+                <div class="post-img" style="background:linear-gradient(135deg, #0e7490, #155e75);">🏔️</div>
+                <div class="post-body">
+                    <div class="post-meta">Himalayan Expeditions • 8 Min Read</div>
+                    <h2 class="post-title">Traversing the Annapurna Circuit in Autumn: The High Mountain Protocol</h2>
+                    <p class="post-desc">Navigating Thorong La Pass at 5,416 meters during early October snow flurries. Essential acclimatization schedules, teahouse packing manifests, and cold-weather gear evaluations.</p>
+                    <button onclick="alert('Article Reader Mode opened: Full route map and GPX telemetry loaded.')" style="background:var(--primary); color:#fff; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer;">Read Field Notes →</button>
+                </div>
+            </article>
+
+            <article class="post-card">
+                <div class="post-img" style="background:linear-gradient(135deg, #b45309, #78350f);">🏜️</div>
+                <div class="post-body">
+                    <div class="post-meta">Middle East Chronicles • 6 Min Read</div>
+                    <h2 class="post-title">Wadi Rum to Petra: 72 Hours in the Jordanian Desert</h2>
+                    <p class="post-desc">Bedouin night camps under the Milky Way, off-road navigation across red dunes, and dawn entry into the rose-red sandstone Treasury.</p>
+                    <button onclick="alert('Article Reader Mode opened!')" style="background:var(--primary); color:#fff; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer;">Read Field Notes →</button>
+                </div>
+            </article>
+        </main>
+
+        <aside>
+            <div class="side-card">
+                <div class="side-title">About the Explorer</div>
+                <p style="font-size:13px; color:var(--text-muted); line-height:1.6;">Hi! I'm Julian Ross, an adventure photographer and travel essayist exploring remote mountain ridges and cultural crossroads.</p>
+            </div>
+            <div class="side-card">
+                <div class="side-title">Destination Tags</div>
+                <span class="tag-pill">#NepalHimalayas</span>
+                <span class="tag-pill">#Patagonia</span>
+                <span class="tag-pill">#KyotoAutumn</span>
+                <span class="tag-pill">#IcelandRingRoad</span>
+                <span class="tag-pill">#BalkanTrails</span>
+            </div>
+            <div class="side-card">
+                <div class="side-title">Join Dispatch Newsletter</div>
+                <input type="email" placeholder="Your email..." style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; margin-bottom:8px; font-size:12px;">
+                <button onclick="alert('Subscribed to GlobeTrotter Monthly Field Dispatches!')" style="width:100%; background:var(--primary); color:#fff; border:none; padding:8px; border-radius:6px; font-weight:600; cursor:pointer; font-size:12px;">Subscribe</button>
+            </div>
+        </aside>
+    </div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinimalStore | Clean Modern E-Commerce Catalog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-dark); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; padding: 18px 0; }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 22px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+        .cart-pill { background: var(--primary); color: #fff; padding: 8px 18px; border-radius: 30px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+        .hero { padding: 40px 0 20px; text-align: center; }
+        .hero h1 { font-size: 38px; font-weight: 800; margin-bottom: 10px; }
+        .hero p { color: var(--text-muted); font-size: 15px; max-width: 550px; margin: 0 auto 24px; }
+
+        .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; background: var(--surface); padding: 14px 20px; border-radius: 10px; border: 1px solid var(--border); }
+        .btn-filter { background: none; border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; margin-right: 8px; }
+        .btn-filter.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; margin-bottom: 60px; }
+        .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.04); }
+        .product-img { height: 180px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+        .product-body { padding: 18px; }
+        .product-cat { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+        .product-title { font-size: 16px; font-weight: 700; margin: 4px 0 8px; }
+        .product-price { font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 12px; }
+        .btn-add { background: var(--primary); color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-inner">
+            <div class="logo">MINIMAL<span>STORE</span></div>
+            <div class="cart-pill" onclick="openCart()">🛍️ Cart (<span id="cartCount">0</span>)</div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container">
+            <h1>Engineered Essentials for Modern Living</h1>
+            <p>Thoughtfully designed lifestyle essentials, audio devices, and ergonomic tools delivered with zero carbon footprint.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="filter-row">
+            <div>
+                <button class="btn-filter active">All Products</button>
+                <button class="btn-filter">Audio & Tech</button>
+                <button class="btn-filter">Workspace</button>
+                <button class="btn-filter">Apparel</button>
+            </div>
+            <select style="padding:6px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px;">
+                <option>Sort by: Featured</option>
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+            </select>
+        </div>
+
+        <div class="catalog-grid">
+            <div class="product-card">
+                <div class="product-img">🎧</div>
+                <div class="product-body">
+                    <span class="product-cat">Audio & Tech</span>
+                    <div class="product-title">Studio Wireless Headphones ANC</div>
+                    <div class="product-price">₹12,499</div>
+                    <button class="btn-add" onclick="addItem('Studio Wireless Headphones', 12499)">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img">⌨️</div>
+                <div class="product-body">
+                    <span class="product-cat">Workspace</span>
+                    <div class="product-title">Low-Profile Mechanical Keyboard</div>
+                    <div class="product-price">₹7,800</div>
+                    <button class="btn-add" onclick="addItem('Mechanical Keyboard', 7800)">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img">🎒</div>
+                <div class="product-body">
+                    <span class="product-cat">Apparel & Gear</span>
+                    <div class="product-title">Waterproof Roll-Top Tech Pack</div>
+                    <div class="product-price">₹4,200</div>
+                    <button class="btn-add" onclick="addItem('Roll-Top Tech Pack', 4200)">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img">💡</div>
+                <div class="product-body">
+                    <span class="product-cat">Workspace</span>
+                    <div class="product-title">Precision Monitor Lightbar</div>
+                    <div class="product-price">₹3,450</div>
+                    <button class="btn-add" onclick="addItem('Precision Lightbar', 3450)">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let items = 0;
+        let sum = 0;
+        function addItem(name, price) {
+            items++;
+            sum += price;
+            document.getElementById('cartCount').innerText = items;
+            alert(name + ' added to cart! Cart total: ₹' + sum.toLocaleString('en-IN'));
+        }
+        function openCart() {
+            if(items === 0) alert('Your cart is empty.');
+            else alert('Checkout Drawer:\nTotal Items: ' + items + '\nSubtotal: ₹' + sum.toLocaleString('en-IN') + '\n\nProceeding to payment gateway!');
+        }
+    </script>
+</body>
+</html>
