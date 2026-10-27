@@ -16,3 +16,11 @@ Smart Transit Bus Pass portal caters to different commuter types (Students, Gene
 
 ## 4. Output Demonstration
 ![Smart Transit Bus Pass](screenshot.png)
+
+
+## 5. Source Code Execution Screenshot
+A capture of the source code implementation (`index.html`) executed for this experiment:
+![Source Code Screenshot](code_screenshot.png)
+
+## 6. Execution Output Verification
+The execution output and verification details are recorded directly inside the source code comments of `index.html` and visually confirmed in `screenshot.png`.

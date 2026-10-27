@@ -25,3 +25,11 @@ Below is the captured output of the Online Beauty Parlour Appointment Booking Sy
 
 ## Conclusion
 The Beauty Parlour Appointment Booking system satisfies all required capabilities for customers, stylists, and managers.
+
+
+## 5. Source Code Execution Screenshot
+A capture of the source code implementation (`index.html`) executed for this experiment:
+![Source Code Screenshot](code_screenshot.png)
+
+## 6. Execution Output Verification
+The execution output and verification details are recorded directly inside the source code comments of `index.html` and visually confirmed in `screenshot.png`.

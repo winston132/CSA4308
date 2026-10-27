@@ -21,3 +21,11 @@ Below is the captured output of Wanderlust Travels:
 
 ## Conclusion
 The Wanderlust Travels platform was successfully constructed, integrating food, accommodation, and route logistics into a unified portal.
+
+
+## 5. Source Code Execution Screenshot
+A capture of the source code implementation (`index.html`) executed for this experiment:
+![Source Code Screenshot](code_screenshot.png)
+
+## 6. Execution Output Verification
+The execution output and verification details are recorded directly inside the source code comments of `index.html` and visually confirmed in `screenshot.png`.

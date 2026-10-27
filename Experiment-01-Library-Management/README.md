@@ -52,3 +52,11 @@ Below is the captured output of the Central Library Management System:
 
 ## Conclusion
 The Central Library Management System was successfully designed and tested. The system fulfills all specified requirements for both Librarian Administrators and Student Users, providing efficient catalog search, automated borrowing, overdue penalty calculation, and academic material access.
+
+
+## 5. Source Code Execution Screenshot
+A capture of the source code implementation (`index.html`) executed for this experiment:
+![Source Code Screenshot](code_screenshot.png)
+
+## 6. Execution Output Verification
+The execution output and verification details are recorded directly inside the source code comments of `index.html` and visually confirmed in `screenshot.png`.
